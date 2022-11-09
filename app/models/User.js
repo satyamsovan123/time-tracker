@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 const { ObjectId } = mongoose.Schema.Types;
 
 const userSchema = new mongoose.Schema({
-  password: { type: String },
-  email: { type: String },
+  email: { type: String, unique: true, required: true },
+  password: { type: String, required: true },
   currentData: { type: [ObjectId] },
 });
 

@@ -1,15 +1,11 @@
 const { validateJWT } = require("./validateJWT");
 const { validateEmail } = require("./validateEmail");
 const { validateRequestBody } = require("./validateRequestBody");
-const {
-  encryptPassword,
-  decryptPassword,
-} = require("./encryptAndDecryptPassword");
+const { handleError } = require("./handleError");
 
 module.exports = {
   validateJWT,
   validateEmail,
   validateRequestBody,
-  encryptPassword,
-  decryptPassword,
+  handleError,
 };
