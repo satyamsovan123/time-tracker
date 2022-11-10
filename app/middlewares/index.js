@@ -1,11 +1,10 @@
-const { validateJWT } = require("./validateJWT");
-const { validateEmail } = require("./validateEmail");
+const { generateJWT, validateJWT } = require("./JWT");
+const { validateEmail } = require("../utils/validateEmail");
 const { validateRequestBody } = require("./validateRequestBody");
-const { handleError } = require("./handleError");
 
 module.exports = {
+  generateJWT,
   validateJWT,
   validateEmail,
   validateRequestBody,
-  handleError,
 };

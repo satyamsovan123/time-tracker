@@ -1,30 +1,27 @@
 const User = require("../../models/User");
-const { validateEmail } = require("../../middlewares/validateEmail");
-const {
-  validateRequestBody,
-} = require("../../middlewares/validateRequestBody");
+const { validateEmail } = require("../../utils/validateEmail");
 const {
   commonConstant,
   dbOperationsConstant,
   bodyConstant,
 } = require("../../../constants/constant");
-const { handleError } = require("../../middlewares/handleError");
 const { logger } = require("../../utils/logger");
 const bcrypt = require("bcrypt");
+const { handleSuccess, handleError } = require("../../utils");
+const { generateJWT } = require("../../middlewares/JWT");
 
 /**
  * This method verifies user provided credentials, by validating email key and password key in the request body
  * and the checking for the user existence. Then the passwords (hashed) are matched using bycrypt
  *
  * @requires {@link validateEmail}
- * @requires {@link validateRequestBody}
  * @requires {@link handleError}
  * @requires {@link logger}
  *
  * @async This function is asynchronous
  * @param {{}} req is the request body object that is received by server
  * @param {{}} res is the response body object that will be sent to client
- * @returns {{message: string, status: boolean }} success response or error response object based on various criterias
+ * @returns {{message: string, status: boolean}} success response (with JWT as cookies) or error response object based on various criterias
  */
 const signin = async (req, res) => {
   /**
@@ -35,26 +32,11 @@ const signin = async (req, res) => {
   /**
    * @type {{statusCode: number, message: string}}
    */
-  let error = {
+  let response = {
     stausCode: 500,
     message: commonConstant.GENERIC_ERROR_MESSAGE,
   };
   try {
-    /**
-     * @type {boolean}
-     * @const
-     */
-    const isValidRequestBody = validateRequestBody(req.body);
-
-    if (!isValidRequestBody) {
-      error = {
-        statusCode: 400,
-        message: `${commonConstant.INVALID_BODY}`,
-        status: false,
-      };
-      return handleError(error, res);
-    }
-
     /**
      * @type {string}
      * @const
@@ -74,36 +56,36 @@ const signin = async (req, res) => {
     const plainTextPassword = req.body[bodyConstant.PASSWORD];
 
     if (!isValidEmail) {
-      error = {
+      response = {
         statusCode: 400,
         message: `${
           bodyConstant.EMAIL.charAt(0).toUpperCase() +
           bodyConstant.EMAIL.slice(1)
         }${commonConstant.INVALID_FIELD}`,
-        status: false,
+        status: isSigninComplete,
       };
-      return handleError(error, res);
+      return handleError(response, res);
     }
 
     /**
-     * @type {({_id: ObjectId, email: string, password: string, currentData: [ObjectId]}|null)}
+     * @type {({_id: ObjectId, email: string, password: string, currentTask: [ObjectId], firstName: string, lastName: string}|null)}
      * @const
      */
-    const userExists = await User.findOne({ email: email });
-    if (!userExists) {
-      error = {
+    const existingUser = await User.findOne({ email: email });
+    if (!existingUser) {
+      response = {
         statusCode: 404,
         message: `${dbOperationsConstant.USER_DOESNT_EXIST}`,
-        status: false,
+        status: isSigninComplete,
       };
-      return handleError(error, res);
+      return handleError(response, res);
     }
 
     /**
      * @type {String}
      * @const
      */
-    const encryptedPassword = userExists.password;
+    const encryptedPassword = existingUser.password;
 
     /**
      * @type {boolean}
@@ -113,30 +95,32 @@ const signin = async (req, res) => {
       plainTextPassword,
       encryptedPassword
     );
-    logger(isPasswordCorrect);
 
     if (isPasswordCorrect) {
+      const token = await generateJWT(existingUser);
       isSigninComplete = true;
-      return res.status(200).json({
+      response = {
+        statusCode: 200,
         message: commonConstant.AUTHENTICATION_SUCCESSFUL,
         status: isSigninComplete,
-      });
+      };
+      return handleSuccess(response, res, token);
     } else {
-      error = {
+      response = {
         statusCode: 401,
         message: `${commonConstant.AUTHENTICATION_UNSUCCESSFUL}`,
-        status: false,
+        status: isSigninComplete,
       };
-      return handleError(error, res);
+      return handleError(response, res);
     }
   } catch (error) {
     logger(error);
-    error = {
+    response = {
       statusCode: 500,
       message: `${commonConstant.GENERIC_ERROR_MESSAGE}`,
       status: isSigninComplete,
     };
-    return handleError(error, res);
+    return handleError(response, res);
   }
 };
 

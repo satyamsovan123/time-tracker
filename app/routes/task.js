@@ -1,8 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { currentTask, updateTask } = require("../controllers/task");
+const { currentTask, addNewTask, updateTask } = require("../controllers/task");
+const { validateJWT } = require("../middlewares/JWT");
 
 router.get("/task", currentTask);
-router.put("/task", updateTask);
+router.post("/task", validateJWT, addNewTask);
+router.put("/task", validateJWT, updateTask);
 
 module.exports = router;

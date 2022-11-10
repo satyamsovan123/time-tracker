@@ -1,25 +1,190 @@
+const User = require("../../models/User");
+const { validateEmail } = require("../../utils/validateEmail");
+const {
+  commonConstant,
+  dbOperationsConstant,
+  bodyConstant,
+} = require("../../../constants/constant");
+
+const { logger } = require("../../utils/logger");
+const { handleError, handleSuccess } = require("../../utils");
+const { currentTask } = require("../task");
+
 /**
- * This method
+ * This method returns the details for an authenticated user
  *
- * @param {*} req is the request body that is received by server
- * @param {*} res is the response body that will be sent to client
- * @returns success response or error response based on various criterias
+ * @requires {@link validateEmail}
+ * @requires {@link handleError}
+ * @requires {@link logger}
+ *
+ * @async This function is asynchronous
+ * @param {{}} req is the request body that is received by server
+ * @param {{}} res is the response body that will be sent to client
+ * @returns {{message: string, status: boolean}} success response with data or error response object based on various criterias
  */
 const profile = async (req, res) => {
-  console.log("profile route");
-  res.status(200).json({ message: "profile route" });
+  /**
+   * @type {boolean}
+   */
+  let isProfileFetched = false;
+
+  /**
+   * @type {{statusCode: number, message: string}}
+   */
+  let response = {
+    stausCode: 500,
+    message: commonConstant.GENERIC_ERROR_MESSAGE,
+  };
+  try {
+    /**
+     * @type {string}
+     * @const
+     */
+    const email = req.body[bodyConstant.EMAIL];
+
+    /**
+     * @type {boolean}
+     * @const
+     */
+    const isValidEmail = validateEmail(email);
+
+    if (!isValidEmail) {
+      response = {
+        statusCode: 400,
+        message: `${
+          bodyConstant.EMAIL.charAt(0).toUpperCase() +
+          bodyConstant.EMAIL.slice(1)
+        }${commonConstant.INVALID_FIELD}`,
+        status: isProfileFetched,
+      };
+      return handleError(response, res);
+    }
+
+    /**
+     * @type {({_id: ObjectId, email: string, password: string, currentTask: [ObjectId]}|null)}
+     * @const
+     */
+    const existingUser = await User.findOne({ email: email }).select(
+      "-_id firstName lastName currentTask"
+    );
+    logger(existingUser);
+    if (!existingUser) {
+      response = {
+        statusCode: 404,
+        message: `${dbOperationsConstant.USER_DOESNT_EXIST}`,
+        status: isProfileFetched,
+      };
+      return handleError(response, res);
+    } else {
+      isProfileFetched = true;
+      console.log("before");
+      const taskList = await currentTask(existingUser.currentTask);
+      existingUser[bodyConstant["CURRENT_TASK"]] = taskList;
+      console.log(taskList);
+      console.log("after");
+
+      // delete existingUser[bodyConstant["CURRENT_TASK"]];
+      response = {
+        data: existingUser,
+        statusCode: 200,
+        message: dbOperationsConstant.DATA_RETRIEVED,
+        status: isProfileFetched,
+      };
+      return handleSuccess(response, res);
+    }
+  } catch (error) {
+    logger(error);
+    response = {
+      statusCode: 500,
+      message: `${commonConstant.GENERIC_ERROR_MESSAGE}`,
+      status: isProfileFetched,
+    };
+    return handleError(response, res);
+  }
 };
 
 /**
- * This method
+ * This method deletes the user and the details from the database
  *
- * @param {*} req is the request body that is received by server
- * @param {*} res is the response body that will be sent to client
- * @returns success response or error response based on various criterias
+ * @requires {@link validateEmail}
+ * @requires {@link handleError}
+ * @requires {@link logger}
+ *
+ * @async This function is asynchronous
+ *
+ * @param {{}} req is the request body that is received by server
+ * @param {{}} res is the response body that will be sent to client
+ * @returns {{message: string, status: boolean}} success response or error response object based on various criterias
  */
 const deleteProfile = async (req, res) => {
-  console.log("delete profile route");
-  res.status(200).json({ message: "delete profile route" });
+  /**
+   * @type {boolean}
+   */
+  let isProfileDeleted = false;
+
+  /**
+   * @type {{statusCode: number, message: string}}
+   */
+  let response = {
+    stausCode: 500,
+    message: commonConstant.GENERIC_ERROR_MESSAGE,
+  };
+  try {
+    /**
+     * @type {string}
+     * @const
+     */
+    const email = req.body[bodyConstant.EMAIL];
+
+    /**
+     * @type {boolean}
+     * @const
+     */
+    const isValidEmail = validateEmail(email);
+
+    if (!isValidEmail) {
+      response = {
+        statusCode: 400,
+        message: `${
+          bodyConstant.EMAIL.charAt(0).toUpperCase() +
+          bodyConstant.EMAIL.slice(1)
+        }${commonConstant.INVALID_FIELD}`,
+        status: isProfileDeleted,
+      };
+      return handleError(response, res);
+    }
+
+    /**
+     * @type {({_id: ObjectId, email: string, password: string, currentTask: [ObjectId]}|null)}
+     * @const
+     */
+    const existingUser = await User.deleteOne({ email: email });
+    logger(existingUser);
+    if (!existingUser || existingUser.deletedCount === 0) {
+      response = {
+        statusCode: 404,
+        message: `${dbOperationsConstant.USER_DOESNT_EXIST}`,
+        status: isProfileDeleted,
+      };
+      return handleError(response, res);
+    } else {
+      isProfileDeleted = true;
+      response = {
+        statusCode: 200,
+        message: dbOperationsConstant.DATA_DELETED,
+        status: isProfileDeleted,
+      };
+      return handleSuccess(response, res);
+    }
+  } catch (error) {
+    logger(error);
+    response = {
+      statusCode: 500,
+      message: `${commonConstant.GENERIC_ERROR_MESSAGE}`,
+      status: isProfileDeleted,
+    };
+    return handleError(response, res);
+  }
 };
 
 module.exports = { profile, deleteProfile };
