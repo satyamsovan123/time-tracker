@@ -80,13 +80,8 @@ const profile = async (req, res) => {
       return handleError(response, res);
     } else {
       isProfileFetched = true;
-      console.log("before");
-      const taskList = await currentTask(existingUser.currentTask);
+      const taskList = [];
       existingUser[bodyConstant["CURRENT_TASK"]] = taskList;
-      console.log(taskList);
-      console.log("after");
-
-      // delete existingUser[bodyConstant["CURRENT_TASK"]];
       response = {
         data: existingUser,
         statusCode: 200,
@@ -97,6 +92,7 @@ const profile = async (req, res) => {
     }
   } catch (error) {
     logger(error);
+    isProfileFetched = false;
     response = {
       statusCode: 500,
       message: `${commonConstant.GENERIC_ERROR_MESSAGE}`,

@@ -9,6 +9,7 @@ const {
 
 const { logger } = require("../../utils/logger");
 const { handleError, handleSuccess, validateEmail } = require("../../utils");
+const User = require("../../models/User");
 
 /**
  * This method returns the task details for the provided task ObjectIds
@@ -241,16 +242,22 @@ const updateTask = async (req, res) => {
 
     await Task.deleteMany({ email: userEmailInHeader });
 
+    let taskIdList = [];
     const newTaskList = await Promise.all(
       await taskList.map(async (task) => {
         const newTask = new Task(task);
         const addedTask = await newTask.save();
+        taskIdList.push(addedTask._id);
         return addedTask;
       })
     );
 
-    // logger(newTaskList);
     if (newTaskList.length === taskList.length) {
+      await User.findOneAndUpdate(
+        { email: userEmailInHeader },
+        { currentTask: taskIdList },
+        { returnNewDocument: true }
+      );
       isTaskAdded = true;
       response = {
         statusCode: 200,
