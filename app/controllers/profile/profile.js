@@ -1,190 +1,253 @@
-const User = require("../../models/User");
-const { validateEmail } = require("../../utils/validateEmail");
+const { Task, User } = require("../../models");
+
 const {
+  bodyConstant,
   commonConstant,
   dbOperationsConstant,
-  bodyConstant,
 } = require("../../../constants/constant");
 
-const { logger } = require("../../utils/logger");
-const { handleError, handleSuccess } = require("../../utils");
-const { currentTask } = require("../task");
-const Task = require("../../models/Task");
+const {
+  handleError,
+  handleSuccess,
+  logger,
+  validateEmail,
+} = require("../../utils");
 
 /**
  * This method returns the details for an authenticated user
  *
- * @requires {@link validateEmail}
  * @requires {@link handleError}
+ * @requires {@link handleSuccess}
  * @requires {@link logger}
+ * @requires {@link validateEmail}
  *
  * @async This function is asynchronous
- * @param {{}} req is the request body that is received by server
+ * @param {{}} req is the request body that is received by server, it has email in the req.body and userEmailInHeader (custom property) passed by the validateJWT middleware
  * @param {{}} res is the response body that will be sent to client
  * @returns {{message: string, status: boolean}} success response with data or error response object based on various criterias
  */
 const profile = async (req, res) => {
   /**
+   * This is the status of the current operation
+   *
    * @type {boolean}
    */
-  let isProfileFetched = false;
+  let status = false;
 
   /**
-   * @type {{statusCode: number, message: string}}
+   * This is the response that is sent to client
+   *
+   * @type {{statusCode: number, message: string, status: status}}
    */
   let response = {
     stausCode: 500,
     message: commonConstant.GENERIC_ERROR_MESSAGE,
+    status: status,
   };
+
+  /**
+   * To avoid any errors, the entire code is placed in try catch block
+   */
   try {
     /**
+     * This is the email passed by the client in request body
+     *
      * @type {string}
      * @const
      */
     const email = req.body[bodyConstant.EMAIL];
+
+    /**
+     * This is the email passed the validateJWT middleware
+     *
+     * @type {string}
+     * @const
+     */
     const userEmailInHeader =
       req[bodyConstant.CURRENT_USER][bodyConstant.EMAIL];
 
     /**
+     * This is the status of the validity of email passed by client in request body
+     *
      * @type {boolean}
      * @const
      */
     const isValidEmail = validateEmail(email);
 
+    /**
+     * Checking if the email from request body is not valid and if it is not same as the email passed by the validateJWT middleware
+     */
     if (!isValidEmail || email !== userEmailInHeader) {
       response = {
-        statusCode: 400,
+        statusCode: 401,
         message: `${
           bodyConstant.EMAIL.charAt(0).toUpperCase() +
           bodyConstant.EMAIL.slice(1)
         }${commonConstant.INVALID_FIELD}`,
-        status: isProfileFetched,
+        status: status,
       };
       return handleError(response, res);
     }
 
     /**
+     * This is the user document that is fetched after querying from the database (only selecting required properties)
+     *
      * @type {({_id: ObjectId, email: string, password: string, currentTask: [ObjectId]}|null)}
      * @const
      */
     const existingUser = await User.findOne({
       email: userEmailInHeader,
     }).select("-_id firstName lastName currentTask");
+
     logger(existingUser);
+
+    /**
+     * Checking if the user doesn't exists, then returning an error, else sending back the user document
+     */
     if (!existingUser) {
       response = {
         statusCode: 404,
         message: `${dbOperationsConstant.USER_DOESNT_EXIST}`,
-        status: isProfileFetched,
+        status: status,
       };
       return handleError(response, res);
     } else {
-      isProfileFetched = true;
-      const taskList = [];
-      existingUser[bodyConstant["CURRENT_TASK"]] = taskList;
+      status = true;
+
       response = {
         data: existingUser,
         statusCode: 200,
         message: dbOperationsConstant.DATA_RETRIEVED,
-        status: isProfileFetched,
+        status: status,
       };
       return handleSuccess(response, res);
     }
   } catch (error) {
+    /**
+     * Incase of any errors in the try block, a generic error message is returned to the user and error is logged to the console
+     */
     logger(error);
-    isProfileFetched = false;
+    status = false;
     response = {
       statusCode: 500,
       message: `${commonConstant.GENERIC_ERROR_MESSAGE}`,
-      status: isProfileFetched,
+      status: status,
     };
     return handleError(response, res);
   }
 };
 
 /**
- * This method deletes the user and the details from the database
+ * This method deletes the user and the realted details from the database
  *
- * @requires {@link validateEmail}
  * @requires {@link handleError}
+ * @requires {@link handleSuccess}
  * @requires {@link logger}
+ * @requires {@link validateEmail}
  *
  * @async This function is asynchronous
- *
- * @param {{}} req is the request body that is received by server
+ * @param {{}} req is the request body that is received by server, it has email in the req.body and userEmailInHeader (custom property) passed by the validateJWT middleware
  * @param {{}} res is the response body that will be sent to client
  * @returns {{message: string, status: boolean}} success response or error response object based on various criterias
  */
 const deleteProfile = async (req, res) => {
   /**
+   * This is the status of the current operation
    * @type {boolean}
    */
-  let isProfileDeleted = false;
+  let status = false;
 
   /**
-   * @type {{statusCode: number, message: string}}
+   * This is the response that is sent to client
+   * @type {{statusCode: number, message: string, status: status}}
    */
   let response = {
     stausCode: 500,
     message: commonConstant.GENERIC_ERROR_MESSAGE,
+    status: status,
   };
+
+  /**
+   * To avoid any errors, the entire code is placed in try catch block
+   */
   try {
     /**
+     * This is the email passed by the client in request body
      * @type {string}
      * @const
      */
     const email = req.body[bodyConstant.EMAIL];
 
     /**
+     * This is the email passed the validateJWT middleware
+     *
+     * @type {string}
+     * @const
+     */
+    const userEmailInHeader =
+      req[bodyConstant.CURRENT_USER][bodyConstant.EMAIL];
+
+    /**
+     * This is the status of the validity of email passed by client in request body
      * @type {boolean}
      * @const
      */
     const isValidEmail = validateEmail(email);
 
-    const userEmailInHeader =
-      req[bodyConstant.CURRENT_USER][bodyConstant.EMAIL];
-
+    /**
+     * Checking if the email from request body is not valid and if it is not same as the email passed by the validateJWT middleware
+     */
     if (!isValidEmail || email !== userEmailInHeader) {
       response = {
-        statusCode: 400,
+        statusCode: 401,
         message: `${
           bodyConstant.EMAIL.charAt(0).toUpperCase() +
           bodyConstant.EMAIL.slice(1)
         }${commonConstant.INVALID_FIELD}`,
-        status: isProfileDeleted,
+        status: status,
       };
       return handleError(response, res);
     }
 
     /**
-     * @type {({_id: ObjectId, email: string, password: string, currentTask: [ObjectId]}|null)}
+     * This is the count of the documents that were deleted after querying from the database (it should be 1 in this case)
+     *
+     * @type {({acknowledged: string, deletedCount: number}|undefined)}
      * @const
      */
     const existingUser = await User.deleteOne({ email: userEmailInHeader });
+
     logger(existingUser);
+
+    /**
+     * Checking if the user doesn't exists or if the deletion was not successful, then returning an error, else also deleting all the tasks related to the same user and sending back the user document
+     */
     if (!existingUser || existingUser.deletedCount === 0) {
       response = {
         statusCode: 404,
         message: `${dbOperationsConstant.USER_DOESNT_EXIST}`,
-        status: isProfileDeleted,
+        status: status,
       };
       return handleError(response, res);
     } else {
       await Task.deleteMany({ email: userEmailInHeader });
-      isProfileDeleted = true;
+      status = true;
       response = {
         statusCode: 200,
         message: dbOperationsConstant.DATA_DELETED,
-        status: isProfileDeleted,
+        status: status,
       };
       return handleSuccess(response, res);
     }
   } catch (error) {
+    /**
+     * Incase of any errors in the try block, a generic error message is returned to the user and error is logged to the console
+     */
     logger(error);
     response = {
       statusCode: 500,
       message: `${commonConstant.GENERIC_ERROR_MESSAGE}`,
-      status: isProfileDeleted,
+      status: status,
     };
     return handleError(response, res);
   }

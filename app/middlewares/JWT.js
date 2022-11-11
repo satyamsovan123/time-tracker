@@ -1,6 +1,6 @@
 const JWTSecretKey = process.env.JWT_SECRET_KEY;
-const jwt = require("jsonwebtoken");
 const { bodyConstant, commonConstant } = require("../../constants/constant");
+const jwt = require("jsonwebtoken");
 const { handleError, logger } = require("../utils");
 
 /**

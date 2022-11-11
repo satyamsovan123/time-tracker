@@ -1,27 +1,32 @@
-const User = require("../../models/User");
-const { validateEmail } = require("../../utils/validateEmail");
-const saltRounds = Number(process.env.SALTROUNDS);
 const bcrypt = require("bcrypt");
+
+const User = require("../../models/User");
+
+const saltRounds = Number(process.env.SALTROUNDS);
 const {
+  bodyConstant,
   commonConstant,
   dbOperationsConstant,
-  bodyConstant,
 } = require("../../../constants/constant");
-const { logger } = require("../../utils/logger");
+
 const {
   handleError,
   handleSuccess,
+  logger,
   validateAlphaNumericString,
+  validateEmail,
 } = require("../../utils");
 const { generateJWT } = require("../../middlewares/JWT");
 
 /**
- * This method verifies user provided data, by validating email key and password key in the request body
- * and the checking for the user's existence
+ * This method verifies user provided data, by validating email and password in the request body
+ * and then checking for the user's existence
  *
- * @requires {@link validateEmail}
  * @requires {@link handleError}
+ * @requires {@link handleSuccess}
  * @requires {@link logger}
+ * @requires {@link validateEmail}
+ * @requires {@link validateAlphaNumericString}
  *
  * @async This function is asynchronous
  * @param {{}} req is the request body object that is received by server
@@ -30,50 +35,86 @@ const { generateJWT } = require("../../middlewares/JWT");
  */
 const signup = async (req, res) => {
   /**
+   * This is the status of the current operation
+   *
    * @type {boolean}
    */
-  let isSignupComplete = false;
+  let status = false;
 
   /**
-   * @type {{statusCode: number, message: string}}
+   * This is the response that is sent to client
+   *
+   * @type {{statusCode: number, message: string, status: status}}
    */
   let response = {
     stausCode: 500,
     message: commonConstant.GENERIC_ERROR_MESSAGE,
+    status: status,
   };
+
+  /**
+   * To avoid any errors, the entire code is placed in try catch block
+   */
   try {
     /**
+     * This is the email passed by the client in request body
+     *
      * @type {string}
      * @const
      */
     const email = req.body[bodyConstant.EMAIL];
+
+    /**
+     * This is the first name passed by the client in request body
+     *
+     * @type {string}
+     * @const
+     */
     const firstName = req.body[bodyConstant.FIRST_NAME];
+
+    /**
+     * This is the last name passed by the client in request body
+     *
+     *  @type {string}
+     * @const
+     */
     const lastName = req.body[bodyConstant.LAST_NAME];
 
     /**
-     * @type {boolean}
+     * This is the status of the validity of first name passed by client in request body
+     *
+     *  @type {boolean}
      * @const
      */
     const isValidFirstName = validateAlphaNumericString(firstName);
 
     /**
+     * This is the status of the validity of last name passed by client in request body
+     *
      * @type {boolean}
      * @const
      */
     const isValidLastName = validateAlphaNumericString(lastName);
 
     /**
+     * This is the status of the validity of email passed by client in request body
+     *
      * @type {boolean}
      * @const
      */
     const isValidEmail = validateEmail(email);
 
     /**
+     * This is the password in plain text (not ecrypted) passed by the client in request body
+     *
      * @type {string}
      * @const
      */
     const plainTextPassword = req.body[bodyConstant.PASSWORD];
 
+    /**
+     * Checking if the email and the password from request body is not valid
+     */
     if (!isValidEmail) {
       response = {
         statusCode: 400,
@@ -86,6 +127,24 @@ const signup = async (req, res) => {
       return handleError(response, res);
     }
 
+    /**
+     * Checking if the password from request body is not valid
+     */
+    if (!plainTextPassword || !plainTextPassword.length) {
+      response = {
+        statusCode: 400,
+        message: `${
+          bodyConstant.PASSWORD.charAt(0).toUpperCase() +
+          bodyConstant.PASSWORD.slice(1)
+        }${commonConstant.INVALID_FIELD}`,
+        status: status,
+      };
+      return handleError(response, res);
+    }
+
+    /**
+     * Checking if the first name and the last name from request body is not valid
+     */
     if (!isValidFirstName || !isValidLastName) {
       response = {
         statusCode: 400,
@@ -96,26 +155,36 @@ const signup = async (req, res) => {
     }
 
     /**
-     * @type {({_id: ObjectId, email: string, password: string, currentTask: [ObjectId], firstName: string, lastName: string}|null)}
+     * This is the user document that is fetched after querying from the database
+     *
+     * @type {({_id: ObjectId, email: string, password: string, currentTask: [ObjectId]}|null)}
      * @const
      */
     const existingUser = await User.findOne({ email: email });
+
+    /**
+     * Checking if the user exists, then returning an error
+     */
     if (existingUser) {
       response = {
         statusCode: 422,
         message: `${dbOperationsConstant.USER_ALREADY_EXISTS}`,
-        status: isSignupComplete,
+        status: status,
       };
       return handleError(response, res);
     }
 
     /**
+     * This is the hashed password that would be stored in the database
+     *
      * @type {String}
      * @const
      */
     const encryptedPassword = await bcrypt.hash(plainTextPassword, saltRounds);
 
     /**
+     * This is the new user that would be saved into the database
+     *
      * @type {({_id: ObjectId, email: string, password: string, currentTask: [ObjectId], firstName: string, lastName: string}|null)}
      * @const
      */
@@ -127,33 +196,50 @@ const signup = async (req, res) => {
     });
 
     /**
+     * This is the user document that is saved in the database
+     *
      * @type {({_id: ObjectId, email: string, password: string, currentTask: [ObjectId], firstName: string, lastName: string}|null)}
      * @const
      */
     const userAdded = await newUser.save();
+
+    logger(userAdded);
+
+    /**
+     * Checking if the user was added to database succesfully, then returning a token to handleSuccess method , else returning an error
+     */
     if (userAdded) {
+      /**
+       * This is the token that is generated by the generateJWT function
+       *
+       * @type {string}
+       * @const
+       */
       const token = await generateJWT(userAdded);
-      isSignupComplete = true;
+      status = true;
       response = {
         statusCode: 201,
         message: dbOperationsConstant.DATA_ADDED,
-        status: isSignupComplete,
+        status: status,
       };
       return handleSuccess(response, res, token);
     } else {
       response = {
         statusCode: 400,
         message: `${dbOperationsConstant.UNABLE_TO_ADD_DATA}`,
-        status: isSignupComplete,
+        status: status,
       };
       return handleError(response, res);
     }
   } catch (error) {
+    /**
+     * Incase of any errors in the try block, a generic error message is returned to the user and error is logged to the console
+     */
     logger(error);
     response = {
       statusCode: 500,
       message: `${commonConstant.GENERIC_ERROR_MESSAGE}`,
-      status: isSignupComplete,
+      status: status,
     };
     return handleError(response, res);
   }
