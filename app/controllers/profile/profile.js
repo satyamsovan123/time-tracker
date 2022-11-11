@@ -9,6 +9,7 @@ const {
 const { logger } = require("../../utils/logger");
 const { handleError, handleSuccess } = require("../../utils");
 const { currentTask } = require("../task");
+const Task = require("../../models/Task");
 
 /**
  * This method returns the details for an authenticated user
@@ -41,6 +42,8 @@ const profile = async (req, res) => {
      * @const
      */
     const email = req.body[bodyConstant.EMAIL];
+    const userEmailInHeader =
+      req[bodyConstant.CURRENT_USER][bodyConstant.EMAIL];
 
     /**
      * @type {boolean}
@@ -48,7 +51,7 @@ const profile = async (req, res) => {
      */
     const isValidEmail = validateEmail(email);
 
-    if (!isValidEmail) {
+    if (!isValidEmail || email !== userEmailInHeader) {
       response = {
         statusCode: 400,
         message: `${
@@ -64,9 +67,9 @@ const profile = async (req, res) => {
      * @type {({_id: ObjectId, email: string, password: string, currentTask: [ObjectId]}|null)}
      * @const
      */
-    const existingUser = await User.findOne({ email: email }).select(
-      "-_id firstName lastName currentTask"
-    );
+    const existingUser = await User.findOne({
+      email: userEmailInHeader,
+    }).select("-_id firstName lastName currentTask");
     logger(existingUser);
     if (!existingUser) {
       response = {
@@ -142,7 +145,10 @@ const deleteProfile = async (req, res) => {
      */
     const isValidEmail = validateEmail(email);
 
-    if (!isValidEmail) {
+    const userEmailInHeader =
+      req[bodyConstant.CURRENT_USER][bodyConstant.EMAIL];
+
+    if (!isValidEmail || email !== userEmailInHeader) {
       response = {
         statusCode: 400,
         message: `${
@@ -158,7 +164,7 @@ const deleteProfile = async (req, res) => {
      * @type {({_id: ObjectId, email: string, password: string, currentTask: [ObjectId]}|null)}
      * @const
      */
-    const existingUser = await User.deleteOne({ email: email });
+    const existingUser = await User.deleteOne({ email: userEmailInHeader });
     logger(existingUser);
     if (!existingUser || existingUser.deletedCount === 0) {
       response = {
@@ -168,6 +174,7 @@ const deleteProfile = async (req, res) => {
       };
       return handleError(response, res);
     } else {
+      await Task.deleteMany({ email: userEmailInHeader });
       isProfileDeleted = true;
       response = {
         statusCode: 200,

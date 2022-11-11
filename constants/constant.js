@@ -2,6 +2,7 @@ const commonConstant = {
   API_STATUS_OK: "Time Tracker API is working",
   DB_CONNECTION_STATUS_OK: "Connection to Mongo DB is successful",
   INVALID_PATH: "Requested path is invalid",
+  INVALID_TIME_RANGE: "Start time is greater than end time",
   INVALID_JWT: "JWT is invalid",
   REQUIRED_FIELD_BLANK: "Required field is blank",
   INVALID_TASK_LIST: "Task list is either empty or invalid",

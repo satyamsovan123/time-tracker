@@ -1,4 +1,6 @@
 const Task = require("../../models/Task");
+const _ = require("lodash");
+
 const {
   commonConstant,
   dbOperationsConstant,
@@ -6,7 +8,7 @@ const {
 } = require("../../../constants/constant");
 
 const { logger } = require("../../utils/logger");
-const { handleError, handleSuccess } = require("../../utils");
+const { handleError, handleSuccess, validateEmail } = require("../../utils");
 
 /**
  * This method returns the task details for the provided task ObjectIds
@@ -18,7 +20,7 @@ const { handleError, handleSuccess } = require("../../utils");
  * @param {[ObjectId]} taskIdList is the array of ObjectId of the tasks
  * @returns {{message: string, status: boolean}} success response with data or error response object based on various criterias
  */
-const currentTask = async (taskIdList) => {
+const currentTask = async (req, res) => {
   /**
    * @type {boolean}
    */
@@ -35,33 +37,47 @@ const currentTask = async (taskIdList) => {
     message: commonConstant.GENERIC_ERROR_MESSAGE,
   };
   try {
-    if (!taskIdList || taskIdList.length === 0) {
-      return taskList;
+    /**
+     * @type {string}
+     * @const
+     */
+    const email = req.body[bodyConstant.EMAIL];
+    const userEmailInHeader =
+      req[bodyConstant.CURRENT_USER][bodyConstant.EMAIL];
+
+    /**
+     * @type {boolean}
+     * @const
+     */
+    const isValidEmail = validateEmail(email);
+
+    if (!isValidEmail || email !== userEmailInHeader) {
+      response = {
+        statusCode: 400,
+        message: `${
+          bodyConstant.EMAIL.charAt(0).toUpperCase() +
+          bodyConstant.EMAIL.slice(1)
+        }${commonConstant.INVALID_FIELD}`,
+        status: isTaskListFetched,
+      };
+      return handleError(response, res);
     }
 
-    await Promise.all(
-      await taskIdList.map(async (taskId) => {
-        // return await convertToUpperCase(word);
-        await Task.find({ _id: taskId })
-          .select("_id startTime endTime timeUsed dateAdded")
-          .then((taskDetails) => {
-            taskList.push(taskDetails[0]);
-          });
-        // taskList.push(taskDetails);
-      })
+    taskList = await Task.find({ email: userEmailInHeader }).select(
+      "-_id -email -__v -dateAdded"
     );
+    console.log(taskList);
+    if (taskList) {
+      isTaskListFetched = true;
+      response = {
+        data: taskList,
+        statusCode: 200,
+        message: `${dbOperationsConstant.DATA_RETRIEVED}`,
+        status: isTaskListFetched,
+      };
+      return handleSuccess(response, res);
+    }
 
-    // taskIdList.forEach(async (taskId) => {
-    //   console.log("before");
-    //   await Task.find({ _id: taskId })
-    //     .select("-_id startTime endTime timeUsed dateAdded")
-    //     .then((taskDetails) => {
-    //       taskList.push(taskDetails);
-    //     });
-    //   console.log("inl", taskList);
-    //   console.log("after");
-    // });
-    // console.log("out", taskList);
     return taskList;
   } catch (error) {
     logger(error);
@@ -75,8 +91,7 @@ const currentTask = async (taskIdList) => {
 };
 
 /**
- * This method adds new task user provided data, by validating email key and password key in the request body
- * and the checking for the user's existence
+ * This method adds new task user provided data, and deletes old tasks by validating req.body
  *
  * @requires {@link handleError}
  * @requires {@link logger}
@@ -86,7 +101,7 @@ const currentTask = async (taskIdList) => {
  * @param {{}} res is the response body object that will be sent to client
  * @returns {{message: string, status: boolean}} success response or error response object based on various criterias
  */
-const addNewTask = async (req, res) => {
+const updateTask = async (req, res) => {
   /**
    * @type {boolean}
    */
@@ -95,7 +110,14 @@ const addNewTask = async (req, res) => {
    * @type {boolean}
    */
   let areAllTasksValid = true;
+
   /**
+   * @type {boolean}
+   */
+  let areAllTimingsUnique = true;
+
+  /**
+   *
    * @type {{statusCode: number, message: string}}
    */
   let response = {
@@ -103,7 +125,37 @@ const addNewTask = async (req, res) => {
     message: commonConstant.GENERIC_ERROR_MESSAGE,
   };
   try {
-    const taskList = req.body[bodyConstant["TASK_LIST"]];
+    /**
+     * @type {string}
+     * @const
+     */
+    const email = req.body[bodyConstant.EMAIL];
+    /**
+     * @type {string}
+     * @const
+     */
+    const userEmailInHeader =
+      req[bodyConstant.CURRENT_USER][bodyConstant.EMAIL];
+
+    /**
+     * @type {boolean}
+     * @const
+     */
+    const isValidEmail = validateEmail(email);
+
+    if (!isValidEmail || email !== userEmailInHeader) {
+      response = {
+        statusCode: 400,
+        message: `${
+          bodyConstant.EMAIL.charAt(0).toUpperCase() +
+          bodyConstant.EMAIL.slice(1)
+        }${commonConstant.INVALID_FIELD}`,
+        status: isTaskAdded,
+      };
+      return handleError(response, res);
+    }
+
+    let taskList = req.body[bodyConstant["TASK_LIST"]];
     if (!taskList || taskList.length === 0) {
       response = {
         statusCode: 500,
@@ -112,9 +164,7 @@ const addNewTask = async (req, res) => {
       };
       return handleError(response, res);
     }
-    const userEmail = req[bodyConstant.CURRENT_USER][bodyConstant.EMAIL];
-    logger(userEmail);
-    logger(taskList);
+
     taskList.forEach((task) => {
       if (
         task.hasOwnProperty(bodyConstant.START_TIME) &&
@@ -126,23 +176,70 @@ const addNewTask = async (req, res) => {
         task.hasOwnProperty(bodyConstant.DATE_ADDED) &&
         task[bodyConstant.DATE_ADDED]
       ) {
-        task[bodyConstant.EMAIL] = userEmail;
+        task[bodyConstant.EMAIL] = userEmailInHeader;
         areAllTasksValid = areAllTasksValid && true;
       } else {
         areAllTasksValid = areAllTasksValid && false;
       }
     });
 
+    taskList = _.sortBy(taskList, bodyConstant.START_TIME);
+    taskList.forEach((task, index) => {
+      if (task[bodyConstant.START_TIME] < task[bodyConstant.END_TIME]) {
+        const timeUsed =
+          Number(
+            new Date(task[bodyConstant.END_TIME]) -
+              new Date(task[bodyConstant.START_TIME])
+          ) / 3600000;
+
+        if (
+          task[bodyConstant.TIME_USED] > 0 &&
+          timeUsed >= task[bodyConstant.TIME_USED]
+        ) {
+          areAllTasksValid = areAllTasksValid && true;
+        } else {
+          areAllTasksValid = areAllTasksValid && false;
+        }
+        areAllTasksValid = areAllTasksValid && true;
+      } else {
+        areAllTasksValid = areAllTasksValid && false;
+      }
+
+      if (index + 1 < taskList.length) {
+        if (
+          taskList[index][bodyConstant.START_TIME] <
+            taskList[index + 1][bodyConstant.START_TIME] &&
+          taskList[index + 1][bodyConstant.START_TIME] <
+            taskList[index][bodyConstant.END_TIME]
+        ) {
+          areAllTasksValid = areAllTasksValid && false;
+        }
+
+        let currentStartTime = taskList[index][bodyConstant.START_TIME];
+        let currentEndTime = taskList[index][bodyConstant.END_TIME];
+
+        let nextStartTime = taskList[index + 1][bodyConstant.START_TIME];
+        let nextEndTime = taskList[index + 1][bodyConstant.END_TIME];
+        areAllTimingsUnique =
+          JSON.stringify({ a: currentStartTime, b: currentEndTime }) !==
+          JSON.stringify({ a: nextStartTime, b: nextEndTime });
+
+        if (!areAllTimingsUnique) {
+          areAllTasksValid = areAllTasksValid && false;
+        }
+      }
+    });
+
     if (!areAllTasksValid) {
       response = {
-        statusCode: 500,
+        statusCode: 400,
         message: `${commonConstant.INVALID_TASK_LIST}`,
         status: isTaskAdded,
       };
       return handleError(response, res);
     }
 
-    const currentTasksForUser = await Task.deleteMany({ email: userEmail });
+    await Task.deleteMany({ email: userEmailInHeader });
 
     const newTaskList = await Promise.all(
       await taskList.map(async (task) => {
@@ -151,7 +248,8 @@ const addNewTask = async (req, res) => {
         return addedTask;
       })
     );
-    logger(newTaskList);
+
+    // logger(newTaskList);
     if (newTaskList.length === taskList.length) {
       isTaskAdded = true;
       response = {
@@ -161,7 +259,6 @@ const addNewTask = async (req, res) => {
       };
       return handleSuccess(response, res);
     } else {
-      logger(error);
       response = {
         statusCode: 500,
         message: `${dbOperationsConstant.UNABLE_TO_ADD_DATA}`,
@@ -180,39 +277,4 @@ const addNewTask = async (req, res) => {
   }
 };
 
-/**
- * This method
- *
- * @requires {@link validateEmail}
- * @requires {@link handleError}
- * @requires {@link logger}
- *
- * @async This function is asynchronous
- * @param {{}} req is the request body object that is received by server
- * @param {{}} res is the response body object that will be sent to client
- * @returns {{message: string, status: boolean}} success response or error response object based on various criterias
- */
-const updateTask = async (req, res) => {
-  const hours1 = 17;
-  const minutes1 = 30;
-  const date1 = new Date();
-  date1.setHours(hours1, minutes1);
-
-  const hours2 = 20;
-  const minutes2 = 10;
-  const date2 = new Date();
-  date2.setHours(hours2, minutes2);
-
-  const timeUsed = (date2 - date1) / 3600000;
-  const newTask = new Task({
-    startTime: date1,
-    endTime: date2,
-    timeUsed: String(timeUsed),
-    dateAdded: new Date(),
-  });
-
-  let x = await newTask.save();
-  res.send(x);
-};
-
-module.exports = { currentTask, addNewTask, updateTask };
+module.exports = { currentTask, updateTask };

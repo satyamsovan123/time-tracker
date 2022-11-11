@@ -52,9 +52,9 @@ const validateJWT = async (req, res, next) => {
      * @type {boolean}
      * @const
      */
-    const verified = jwt.verify(token, JWTSecretKey);
-    if (verified) {
-      req[bodyConstant.CURRENT_USER] = verified;
+    const verifiedUser = jwt.verify(token, JWTSecretKey);
+    if (verifiedUser) {
+      req[bodyConstant.CURRENT_USER] = verifiedUser;
       return next();
     }
   } catch (error) {

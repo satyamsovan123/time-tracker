@@ -1,2 +1,2 @@
-const { currentTask, updateTask, addNewTask } = require("./task");
-module.exports = { currentTask, updateTask, addNewTask };
+const { currentTask, updateTask } = require("./task");
+module.exports = { currentTask, updateTask };
