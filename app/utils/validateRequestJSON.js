@@ -9,12 +9,10 @@ const { logger } = require("./logger");
  *
  * @async This function is asynchronous
  * @param {{}} err is the error object
- * @param {{}} req is the request body that is received by server
- * @param {{}} res is the response body that will be sent to client
  * @param {{}} next is the middleware that is called later on successful validation of request JSON
  * @returns {{}} the control to the next middleware by calling the {@link next()} function, else it returns error if a the request JSON is not valid
  */
-const validateRequestJSON = (err, req, res, next) => {
+const validateRequestJSON = (err, next) => {
   /**
    * Checking if the (JSON is valid or not) the error is related to SyntaxError and there is 'body' in the message of the error, it that's the case then returning an error, else passing the control to next middleware
    */
