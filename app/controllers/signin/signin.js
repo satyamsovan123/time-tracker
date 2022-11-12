@@ -1,6 +1,8 @@
 const bcrypt = require("bcrypt");
+// const { moment } = require("moment");
+const moment = require("moment-timezone");
 
-const { User } = require("../../models");
+const { User, Task } = require("../../models");
 
 const {
   COMMON_CONSTANT,
@@ -164,7 +166,81 @@ const signin = async (req, res) => {
         status: status,
       };
 
+      logger(existingUser);
       logger(token);
+
+      /**
+       * NOTE: This below logic is kind of redundant, but still it's just sitting here!
+       */
+
+      /**
+       * This is the task list for the logged in user, it has startTime, endTime and dateAdded in UTC format (we need to convert it)
+       *
+       * @type {({_id: ObjectId, email: string, startTime: Date, endTime: Date, dateAdded: Date, timeUsed: string}|null)}
+       * @const
+       */
+      const taskList = await Task.find({
+        email: existingUser[BODY_CONSTANT.EMAIL],
+      });
+
+      logger(taskList);
+
+      /**
+       * This is the task list id list for the logged in user that will be updated later
+       *
+       * @type {[]}
+       */
+      let taskIdList = [];
+
+      /**
+       * Checking if task list has some tasks in it i.e if the length of the task list that is fetched from database, is more than 0
+       */
+      if (taskList && taskList.length > 0) {
+        /**
+         * On every login, looping through each task and checking if the created tasks are expired
+         * Date comes from client as local time zone (say IST), but MongoDB stores dates in UTC, so converting UTC to local time zone
+         */
+        taskList.forEach(async (task) => {
+          /**
+           * This is the dateAdded for all the tasks that is received in UTC, that is then converted to local time zone (we only extract the date here)
+           *
+           * @type {date}
+           * @const
+           */
+          const dateAddedLocalTimeZone = new moment(task.dateAdded).format(
+            "DD-MM-YYYY"
+          );
+
+          /**
+           * This is the current time in UTC, that is then converted to local time zone (we only extract the date here)
+           *
+           * @type {date}
+           * @const
+           */
+          const currentDateLocalTimeZone = new moment(new Date()).format(
+            "DD-MM-YYYY"
+          );
+
+          /**
+           * Checking if the current time is more that the date added for the current task, then deleting the tasks, else if the task are not expired for current date, then those task ids are preserved, to update corresponding user document
+           */
+          if (dateAddedLocalTimeZone < currentDateLocalTimeZone) {
+            await Task.findByIdAndDelete(task._id);
+          } else {
+            taskIdList.push(task._id);
+          }
+        });
+
+        /**
+         * Updating the user document with new task ids
+         */
+        await User.findOneAndUpdate(
+          { email: existingUser[BODY_CONSTANT.EMAIL] },
+          { currentTask: taskIdList },
+          { returnNewDocument: false }
+        );
+      }
+
       return handleSuccess(response, res, token);
     } else {
       response = {

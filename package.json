@@ -8,6 +8,8 @@
     "jsonwebtoken": "^8.5.1",
     "loadsh": "^0.0.4",
     "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "moment-timezone": "^0.5.38",
     "mongoose": "^6.7.2",
     "uuid": "^9.0.0"
   },

@@ -25,8 +25,8 @@ const { generateJWT } = require("../../middlewares/JWT");
  * @requires {@link handleError}
  * @requires {@link handleSuccess}
  * @requires {@link logger}
- * @requires {@link validateEmail}
  * @requires {@link validateAlphaNumericString}
+ * @requires {@link validateEmail}
  *
  * @async This function is asynchronous
  * @param {{}} req is the request body object that is received by server

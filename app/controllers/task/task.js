@@ -1,4 +1,5 @@
 const _ = require("lodash");
+
 const { Task, User } = require("../../models");
 
 const {
@@ -262,6 +263,7 @@ const updateTask = async (req, res) => {
         task[BODY_CONSTANT.EMAIL] = userEmailInHeader;
         areAllTasksValid = areAllTasksValid && true;
       } else {
+        logger("Invalid fields");
         areAllTasksValid = areAllTasksValid && false;
       }
     });
@@ -291,10 +293,12 @@ const updateTask = async (req, res) => {
         ) {
           areAllTasksValid = areAllTasksValid && true;
         } else {
+          logger("Invalid time used");
           areAllTasksValid = areAllTasksValid && false;
         }
         areAllTasksValid = areAllTasksValid && true;
       } else {
+        logger("Invalid range");
         areAllTasksValid = areAllTasksValid && false;
       }
 
@@ -317,6 +321,7 @@ const updateTask = async (req, res) => {
           taskList[index + 1][BODY_CONSTANT.START_TIME] <
             taskList[index][BODY_CONSTANT.END_TIME]
         ) {
+          logger("Repeated timings");
           areAllTasksValid = areAllTasksValid && false;
         }
 
@@ -363,6 +368,7 @@ const updateTask = async (req, res) => {
          * Chekcking if all time calculated above are not unique
          */
         if (!areAllTimingsUnique) {
+          logger("Duplicate fields");
           areAllTasksValid = areAllTasksValid && false;
         }
       }
