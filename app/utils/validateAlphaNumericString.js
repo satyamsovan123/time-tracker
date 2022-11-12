@@ -6,15 +6,20 @@
  */
 const validateAlphaNumericString = (data) => {
   /**
+   * This is the status of the verification of the email
+   *
    * @type {boolean}
    */
-  let isStringAlphaNumeric = false;
+  let status = false;
 
+  /**
+   * Checking if data has a valid length and then matching the email with alphnumeric pattern, else returning an error response
+   */
   if (data && data.length) {
-    isStringAlphaNumeric = String(data).match(/^\w+$/);
+    status = String(data).match(/^\w+$/);
   }
 
-  return isStringAlphaNumeric;
+  return status;
 };
 
 module.exports = { validateAlphaNumericString };

@@ -439,6 +439,8 @@ const updateTask = async (req, res) => {
         message: dbOperationsConstant.DATA_UPDATED,
         status: status,
       };
+
+      logger(taskIdList);
       return handleSuccess(response, res);
     } else {
       response = {

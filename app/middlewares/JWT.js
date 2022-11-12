@@ -1,24 +1,31 @@
+const jwt = require("jsonwebtoken");
+
 const JWTSecretKey = process.env.JWT_SECRET_KEY;
 const { bodyConstant, commonConstant } = require("../../constants/constant");
-const jwt = require("jsonwebtoken");
+
 const { handleError, logger } = require("../utils");
 
 /**
- * This method generates the JSON Web Token after user is authenticated
+ * This function generates the JSON Web Token after user is authenticated
  *
  * @async This function is asynchronous
- * @param {({_id: ObjectId, email: string, password: string, currentTask: [ObjectId]})} user is the user that was authenticated
+ * @param {({_id: ObjectId, email: string, password: string, currentTask: [ObjectId]})} user is the user that is authenticated
  * @returns {string} the JWT containing encrypted user id
  */
 const generateJWT = async (user) => {
   /**
+   * This is the object that would be used to generate token
+   *
    * @type {{email: string}}
    * @const
    */
   const data = {
     email: user.email,
   };
+
   /**
+   * This is the token that is returned
+   *
    * @type {string}
    * @const
    */
@@ -27,37 +34,56 @@ const generateJWT = async (user) => {
 };
 
 /**
- * This method validates the JSON Web Token that is sent in every request's header
+ * This middleware function validates the JSON Web Token that is sent in every request's header
  *
  * @async This function is asynchronous
  * @param {{}} req is the request body that is received by server
  * @param {{}} res is the response body that will be sent to client
- * @returns {boolean} true if JWT is not empty and valid, else it returns false
+ * @param {{}} next is the middleware that is called later on successful verification
+ * @returns {{}} the control to the next middleware by calling the {@link next()} function, else it returns error if a valid JWT token is not passed in the request header
  */
 const validateJWT = async (req, res, next) => {
   /**
-   * @type {{statusCode: number, message: string}}
+   * This is the response that is sent to client
+   *
+   * @type {{statusCode: number, message: string, status: status}}
    */
   let response = {
     stausCode: 500,
     message: commonConstant.GENERIC_ERROR_MESSAGE,
   };
+
+  /**
+   * To avoid any errors, the entire code is placed in try catch block
+   */
   try {
     /**
+     * This is the token that is received from request header sent by client
+     *
      * @type {string}
      * @const
      */
     const token = req.header(bodyConstant["TIME_TRACKER_TOKEN"]);
+
     /**
+     * This is the status of the verification of the token
+     *
      * @type {boolean}
      * @const
      */
     const verifiedUser = jwt.verify(token, JWTSecretKey);
+
+    /**
+     * Checking if the user has a verified token, the call goes to next middleware, else returning an error
+     */
     if (verifiedUser) {
       req[bodyConstant.CURRENT_USER] = verifiedUser;
       return next();
     }
   } catch (error) {
+    /**
+     * Incase of any errors in the try block, a generic error message is returned to the user and error is logged to the console
+     */
     logger(error);
     response = {
       statusCode: 401,

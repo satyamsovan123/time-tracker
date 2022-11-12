@@ -102,7 +102,7 @@ const profile = async (req, res) => {
     logger(existingUser);
 
     /**
-     * Checking if the user doesn't exists, then returning an error, else sending back the user document
+     * Checking if the user doesn't exists, then returning an error, else returning back the user document
      */
     if (!existingUser) {
       response = {

@@ -163,6 +163,8 @@ const signin = async (req, res) => {
         message: commonConstant.AUTHENTICATION_SUCCESSFUL,
         status: status,
       };
+
+      logger(token);
       return handleSuccess(response, res, token);
     } else {
       response = {

@@ -1,5 +1,6 @@
-const { commonConstant } = require("../../constants/constant");
 require("dotenv").config();
+
+const { commonConstant } = require("../../constants/constant");
 
 /**
  * This method prints the data provided in the console, if the environment is not production
