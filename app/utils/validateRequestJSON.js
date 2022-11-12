@@ -1,4 +1,4 @@
-const { commonConstant } = require("../../constants/constant");
+const { COMMON_CONSTANT } = require("../../constants/constant");
 
 const { handleError } = require("./handleError");
 const { logger } = require("./logger");
@@ -20,7 +20,7 @@ const validateRequestJSON = (err, next) => {
     logger(err);
     const response = {
       statusCode: 400,
-      message: commonConstant.INVALID_BODY,
+      message: COMMON_CONSTANT.INVALID_BODY,
     };
     return handleError(response, res);
   }

@@ -1,9 +1,9 @@
 const { Task, User } = require("../../models");
 
 const {
-  bodyConstant,
-  commonConstant,
-  dbOperationsConstant,
+  BODY_CONSTANT,
+  COMMON_CONSTANT,
+  DB_OPERATION_CONSTANT,
 } = require("../../../constants/constant");
 
 const {
@@ -41,7 +41,7 @@ const profile = async (req, res) => {
    */
   let response = {
     stausCode: 500,
-    message: commonConstant.GENERIC_ERROR_MESSAGE,
+    message: COMMON_CONSTANT.GENERIC_ERROR_MESSAGE,
     status: status,
   };
 
@@ -55,7 +55,7 @@ const profile = async (req, res) => {
      * @type {string}
      * @const
      */
-    const email = req.body[bodyConstant.EMAIL];
+    const email = req.body[BODY_CONSTANT.EMAIL];
 
     /**
      * This is the email passed the validateJWT middleware
@@ -64,7 +64,7 @@ const profile = async (req, res) => {
      * @const
      */
     const userEmailInHeader =
-      req[bodyConstant.CURRENT_USER][bodyConstant.EMAIL];
+      req[BODY_CONSTANT.CURRENT_USER][BODY_CONSTANT.EMAIL];
 
     /**
      * This is the status of the validity of email passed by client in request body
@@ -81,9 +81,9 @@ const profile = async (req, res) => {
       response = {
         statusCode: 401,
         message: `${
-          bodyConstant.EMAIL.charAt(0).toUpperCase() +
-          bodyConstant.EMAIL.slice(1)
-        }${commonConstant.INVALID_FIELD}`,
+          BODY_CONSTANT.EMAIL.charAt(0).toUpperCase() +
+          BODY_CONSTANT.EMAIL.slice(1)
+        }${COMMON_CONSTANT.INVALID_FIELD}`,
         status: status,
       };
       return handleError(response, res);
@@ -107,7 +107,7 @@ const profile = async (req, res) => {
     if (!existingUser) {
       response = {
         statusCode: 404,
-        message: `${dbOperationsConstant.USER_DOESNT_EXIST}`,
+        message: `${DB_OPERATION_CONSTANT.USER_DOESNT_EXIST}`,
         status: status,
       };
       return handleError(response, res);
@@ -117,7 +117,7 @@ const profile = async (req, res) => {
       response = {
         data: existingUser,
         statusCode: 200,
-        message: dbOperationsConstant.DATA_RETRIEVED,
+        message: DB_OPERATION_CONSTANT.DATA_RETRIEVED,
         status: status,
       };
       return handleSuccess(response, res);
@@ -129,7 +129,7 @@ const profile = async (req, res) => {
     logger(error);
     response = {
       statusCode: 500,
-      message: `${commonConstant.GENERIC_ERROR_MESSAGE}`,
+      message: `${COMMON_CONSTANT.GENERIC_ERROR_MESSAGE}`,
       status: status,
     };
     return handleError(response, res);
@@ -162,7 +162,7 @@ const deleteProfile = async (req, res) => {
    */
   let response = {
     stausCode: 500,
-    message: commonConstant.GENERIC_ERROR_MESSAGE,
+    message: COMMON_CONSTANT.GENERIC_ERROR_MESSAGE,
     status: status,
   };
 
@@ -175,7 +175,7 @@ const deleteProfile = async (req, res) => {
      * @type {string}
      * @const
      */
-    const email = req.body[bodyConstant.EMAIL];
+    const email = req.body[BODY_CONSTANT.EMAIL];
 
     /**
      * This is the email passed the validateJWT middleware
@@ -184,7 +184,7 @@ const deleteProfile = async (req, res) => {
      * @const
      */
     const userEmailInHeader =
-      req[bodyConstant.CURRENT_USER][bodyConstant.EMAIL];
+      req[BODY_CONSTANT.CURRENT_USER][BODY_CONSTANT.EMAIL];
 
     /**
      * This is the status of the validity of email passed by client in request body
@@ -200,9 +200,9 @@ const deleteProfile = async (req, res) => {
       response = {
         statusCode: 401,
         message: `${
-          bodyConstant.EMAIL.charAt(0).toUpperCase() +
-          bodyConstant.EMAIL.slice(1)
-        }${commonConstant.INVALID_FIELD}`,
+          BODY_CONSTANT.EMAIL.charAt(0).toUpperCase() +
+          BODY_CONSTANT.EMAIL.slice(1)
+        }${COMMON_CONSTANT.INVALID_FIELD}`,
         status: status,
       };
       return handleError(response, res);
@@ -224,7 +224,7 @@ const deleteProfile = async (req, res) => {
     if (!existingUser || existingUser.deletedCount === 0) {
       response = {
         statusCode: 404,
-        message: `${dbOperationsConstant.USER_DOESNT_EXIST}`,
+        message: `${DB_OPERATION_CONSTANT.USER_DOESNT_EXIST}`,
         status: status,
       };
       return handleError(response, res);
@@ -233,7 +233,7 @@ const deleteProfile = async (req, res) => {
       status = true;
       response = {
         statusCode: 200,
-        message: dbOperationsConstant.DATA_DELETED,
+        message: DB_OPERATION_CONSTANT.DATA_DELETED,
         status: status,
       };
       return handleSuccess(response, res);
@@ -245,7 +245,7 @@ const deleteProfile = async (req, res) => {
     logger(error);
     response = {
       statusCode: 500,
-      message: `${commonConstant.GENERIC_ERROR_MESSAGE}`,
+      message: `${COMMON_CONSTANT.GENERIC_ERROR_MESSAGE}`,
       status: status,
     };
     return handleError(response, res);

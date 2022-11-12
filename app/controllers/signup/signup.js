@@ -4,9 +4,9 @@ const User = require("../../models/User");
 
 const saltRounds = Number(process.env.SALTROUNDS);
 const {
-  bodyConstant,
-  commonConstant,
-  dbOperationsConstant,
+  BODY_CONSTANT,
+  COMMON_CONSTANT,
+  DB_OPERATION_CONSTANT,
 } = require("../../../constants/constant");
 
 const {
@@ -48,7 +48,7 @@ const signup = async (req, res) => {
    */
   let response = {
     stausCode: 500,
-    message: commonConstant.GENERIC_ERROR_MESSAGE,
+    message: COMMON_CONSTANT.GENERIC_ERROR_MESSAGE,
     status: status,
   };
 
@@ -62,7 +62,7 @@ const signup = async (req, res) => {
      * @type {string}
      * @const
      */
-    const email = req.body[bodyConstant.EMAIL];
+    const email = req.body[BODY_CONSTANT.EMAIL];
 
     /**
      * This is the first name passed by the client in request body
@@ -70,7 +70,7 @@ const signup = async (req, res) => {
      * @type {string}
      * @const
      */
-    const firstName = req.body[bodyConstant.FIRST_NAME];
+    const firstName = req.body[BODY_CONSTANT.FIRST_NAME];
 
     /**
      * This is the last name passed by the client in request body
@@ -78,7 +78,7 @@ const signup = async (req, res) => {
      *  @type {string}
      * @const
      */
-    const lastName = req.body[bodyConstant.LAST_NAME];
+    const lastName = req.body[BODY_CONSTANT.LAST_NAME];
 
     /**
      * This is the status of the validity of first name passed by client in request body
@@ -110,7 +110,7 @@ const signup = async (req, res) => {
      * @type {string}
      * @const
      */
-    const plainTextPassword = req.body[bodyConstant.PASSWORD];
+    const plainTextPassword = req.body[BODY_CONSTANT.PASSWORD];
 
     /**
      * Checking if the email and the password from request body is not valid
@@ -119,9 +119,9 @@ const signup = async (req, res) => {
       response = {
         statusCode: 400,
         message: `${
-          bodyConstant.EMAIL.charAt(0).toUpperCase() +
-          bodyConstant.EMAIL.slice(1)
-        }${commonConstant.INVALID_FIELD}`,
+          BODY_CONSTANT.EMAIL.charAt(0).toUpperCase() +
+          BODY_CONSTANT.EMAIL.slice(1)
+        }${COMMON_CONSTANT.INVALID_FIELD}`,
         status: false,
       };
       return handleError(response, res);
@@ -134,9 +134,9 @@ const signup = async (req, res) => {
       response = {
         statusCode: 400,
         message: `${
-          bodyConstant.PASSWORD.charAt(0).toUpperCase() +
-          bodyConstant.PASSWORD.slice(1)
-        }${commonConstant.INVALID_FIELD}`,
+          BODY_CONSTANT.PASSWORD.charAt(0).toUpperCase() +
+          BODY_CONSTANT.PASSWORD.slice(1)
+        }${COMMON_CONSTANT.INVALID_FIELD}`,
         status: status,
       };
       return handleError(response, res);
@@ -148,7 +148,7 @@ const signup = async (req, res) => {
     if (!isValidFirstName || !isValidLastName) {
       response = {
         statusCode: 400,
-        message: `${commonConstant.NAME_IS_INVALID}`,
+        message: `${COMMON_CONSTANT.NAME_IS_INVALID}`,
         status: false,
       };
       return handleError(response, res);
@@ -168,7 +168,7 @@ const signup = async (req, res) => {
     if (existingUser) {
       response = {
         statusCode: 422,
-        message: `${dbOperationsConstant.USER_ALREADY_EXISTS}`,
+        message: `${DB_OPERATION_CONSTANT.USER_ALREADY_EXISTS}`,
         status: status,
       };
       return handleError(response, res);
@@ -219,14 +219,14 @@ const signup = async (req, res) => {
       status = true;
       response = {
         statusCode: 201,
-        message: dbOperationsConstant.DATA_ADDED,
+        message: DB_OPERATION_CONSTANT.DATA_ADDED,
         status: status,
       };
       return handleSuccess(response, res, token);
     } else {
       response = {
         statusCode: 400,
-        message: `${dbOperationsConstant.UNABLE_TO_ADD_DATA}`,
+        message: `${DB_OPERATION_CONSTANT.UNABLE_TO_ADD_DATA}`,
         status: status,
       };
       return handleError(response, res);
@@ -238,7 +238,7 @@ const signup = async (req, res) => {
     logger(error);
     response = {
       statusCode: 500,
-      message: `${commonConstant.GENERIC_ERROR_MESSAGE}`,
+      message: `${COMMON_CONSTANT.GENERIC_ERROR_MESSAGE}`,
       status: status,
     };
     return handleError(response, res);

@@ -3,9 +3,9 @@ const bcrypt = require("bcrypt");
 const { User } = require("../../models");
 
 const {
-  commonConstant,
-  dbOperationsConstant,
-  bodyConstant,
+  COMMON_CONSTANT,
+  DB_OPERATION_CONSTANT,
+  BODY_CONSTANT,
 } = require("../../../constants/constant");
 
 const {
@@ -45,7 +45,7 @@ const signin = async (req, res) => {
    */
   let response = {
     stausCode: 500,
-    message: commonConstant.GENERIC_ERROR_MESSAGE,
+    message: COMMON_CONSTANT.GENERIC_ERROR_MESSAGE,
     status: status,
   };
 
@@ -59,7 +59,7 @@ const signin = async (req, res) => {
      *  @type {string}
      * @const
      */
-    const email = req.body[bodyConstant.EMAIL];
+    const email = req.body[BODY_CONSTANT.EMAIL];
 
     /**
      * This is the status of the validity of email passed by client in request body
@@ -75,7 +75,7 @@ const signin = async (req, res) => {
      * @type {string}
      * @const
      */
-    const plainTextPassword = req.body[bodyConstant.PASSWORD];
+    const plainTextPassword = req.body[BODY_CONSTANT.PASSWORD];
 
     /**
      * Checking if the email from request body is not valid
@@ -84,9 +84,9 @@ const signin = async (req, res) => {
       response = {
         statusCode: 400,
         message: `${
-          bodyConstant.EMAIL.charAt(0).toUpperCase() +
-          bodyConstant.EMAIL.slice(1)
-        }${commonConstant.INVALID_FIELD}`,
+          BODY_CONSTANT.EMAIL.charAt(0).toUpperCase() +
+          BODY_CONSTANT.EMAIL.slice(1)
+        }${COMMON_CONSTANT.INVALID_FIELD}`,
         status: status,
       };
       return handleError(response, res);
@@ -99,9 +99,9 @@ const signin = async (req, res) => {
       response = {
         statusCode: 400,
         message: `${
-          bodyConstant.PASSWORD.charAt(0).toUpperCase() +
-          bodyConstant.PASSWORD.slice(1)
-        }${commonConstant.INVALID_FIELD}`,
+          BODY_CONSTANT.PASSWORD.charAt(0).toUpperCase() +
+          BODY_CONSTANT.PASSWORD.slice(1)
+        }${COMMON_CONSTANT.INVALID_FIELD}`,
         status: status,
       };
       return handleError(response, res);
@@ -121,7 +121,7 @@ const signin = async (req, res) => {
     if (!existingUser) {
       response = {
         statusCode: 404,
-        message: `${dbOperationsConstant.USER_DOESNT_EXIST}`,
+        message: `${DB_OPERATION_CONSTANT.USER_DOESNT_EXIST}`,
         status: status,
       };
       return handleError(response, res);
@@ -160,7 +160,7 @@ const signin = async (req, res) => {
       status = true;
       response = {
         statusCode: 200,
-        message: commonConstant.AUTHENTICATION_SUCCESSFUL,
+        message: COMMON_CONSTANT.AUTHENTICATION_SUCCESSFUL,
         status: status,
       };
 
@@ -169,7 +169,7 @@ const signin = async (req, res) => {
     } else {
       response = {
         statusCode: 401,
-        message: `${commonConstant.AUTHENTICATION_UNSUCCESSFUL}`,
+        message: `${COMMON_CONSTANT.AUTHENTICATION_UNSUCCESSFUL}`,
         status: status,
       };
       return handleError(response, res);
@@ -181,7 +181,7 @@ const signin = async (req, res) => {
     logger(error);
     response = {
       statusCode: 500,
-      message: `${commonConstant.GENERIC_ERROR_MESSAGE}`,
+      message: `${COMMON_CONSTANT.GENERIC_ERROR_MESSAGE}`,
       status: status,
     };
     return handleError(response, res);

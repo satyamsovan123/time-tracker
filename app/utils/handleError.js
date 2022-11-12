@@ -1,4 +1,4 @@
-const { commonConstant } = require("../../constants/constant");
+const { COMMON_CONSTANT } = require("../../constants/constant");
 
 /**
  * This method receives the error object and sends error to client incase of any error,
@@ -24,7 +24,7 @@ const handleError = (error, res) => {
    * @type {string}
    * @const
    */
-  const message = error.message || commonConstant.GENERIC_ERROR_MESSAGE;
+  const message = error.message || COMMON_CONSTANT.GENERIC_ERROR_MESSAGE;
 
   /**
    * This is the status of the verification of the email

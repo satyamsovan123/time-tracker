@@ -2,9 +2,9 @@ const _ = require("lodash");
 const { Task, User } = require("../../models");
 
 const {
-  commonConstant,
-  dbOperationsConstant,
-  bodyConstant,
+  COMMON_CONSTANT,
+  DB_OPERATION_CONSTANT,
+  BODY_CONSTANT,
 } = require("../../../constants/constant");
 
 const {
@@ -42,7 +42,7 @@ const currentTask = async (req, res) => {
    */
   let response = {
     stausCode: 500,
-    message: commonConstant.GENERIC_ERROR_MESSAGE,
+    message: COMMON_CONSTANT.GENERIC_ERROR_MESSAGE,
     status: status,
   };
 
@@ -63,7 +63,7 @@ const currentTask = async (req, res) => {
      * @type {string}
      * @const
      */
-    const email = req.body[bodyConstant.EMAIL];
+    const email = req.body[BODY_CONSTANT.EMAIL];
 
     /**
      * This is the email passed the validateJWT middleware
@@ -72,7 +72,7 @@ const currentTask = async (req, res) => {
      * @const
      */
     const userEmailInHeader =
-      req[bodyConstant.CURRENT_USER][bodyConstant.EMAIL];
+      req[BODY_CONSTANT.CURRENT_USER][BODY_CONSTANT.EMAIL];
 
     /**
      * This is the status of the validity of email passed by client in request body
@@ -89,9 +89,9 @@ const currentTask = async (req, res) => {
       response = {
         statusCode: 401,
         message: `${
-          bodyConstant.EMAIL.charAt(0).toUpperCase() +
-          bodyConstant.EMAIL.slice(1)
-        }${commonConstant.INVALID_FIELD}`,
+          BODY_CONSTANT.EMAIL.charAt(0).toUpperCase() +
+          BODY_CONSTANT.EMAIL.slice(1)
+        }${COMMON_CONSTANT.INVALID_FIELD}`,
         status: status,
       };
       return handleError(response, res);
@@ -113,7 +113,7 @@ const currentTask = async (req, res) => {
     response = {
       data: taskList,
       statusCode: 200,
-      message: `${dbOperationsConstant.DATA_RETRIEVED}`,
+      message: `${DB_OPERATION_CONSTANT.DATA_RETRIEVED}`,
       status: status,
     };
     return handleSuccess(response, res);
@@ -124,7 +124,7 @@ const currentTask = async (req, res) => {
     logger(error);
     response = {
       statusCode: 500,
-      message: `${commonConstant.GENERIC_ERROR_MESSAGE}`,
+      message: `${COMMON_CONSTANT.GENERIC_ERROR_MESSAGE}`,
       status: status,
     };
     return handleError(response, res);
@@ -159,7 +159,7 @@ const updateTask = async (req, res) => {
    */
   let response = {
     stausCode: 500,
-    message: commonConstant.GENERIC_ERROR_MESSAGE,
+    message: COMMON_CONSTANT.GENERIC_ERROR_MESSAGE,
     status: status,
   };
 
@@ -194,7 +194,7 @@ const updateTask = async (req, res) => {
      * @type {string}
      * @const
      */
-    const email = req.body[bodyConstant.EMAIL];
+    const email = req.body[BODY_CONSTANT.EMAIL];
 
     /**
      * This is the email passed the validateJWT middleware
@@ -203,7 +203,7 @@ const updateTask = async (req, res) => {
      * @const
      */
     const userEmailInHeader =
-      req[bodyConstant.CURRENT_USER][bodyConstant.EMAIL];
+      req[BODY_CONSTANT.CURRENT_USER][BODY_CONSTANT.EMAIL];
 
     /**
      * This is the status of the validity of email passed by client in request body
@@ -220,9 +220,9 @@ const updateTask = async (req, res) => {
       response = {
         statusCode: 401,
         message: `${
-          bodyConstant.EMAIL.charAt(0).toUpperCase() +
-          bodyConstant.EMAIL.slice(1)
-        }${commonConstant.INVALID_FIELD}`,
+          BODY_CONSTANT.EMAIL.charAt(0).toUpperCase() +
+          BODY_CONSTANT.EMAIL.slice(1)
+        }${COMMON_CONSTANT.INVALID_FIELD}`,
         status: status,
       };
       return handleError(response, res);
@@ -231,7 +231,7 @@ const updateTask = async (req, res) => {
     /**
      * The tasklist is updated with the details provided by the user
      */
-    taskList = req.body[bodyConstant["TASK_LIST"]];
+    taskList = req.body[BODY_CONSTANT["TASK_LIST"]];
 
     /**
      * Checking if the task list from request body is empty
@@ -239,7 +239,7 @@ const updateTask = async (req, res) => {
     if (!taskList || taskList.length === 0) {
       response = {
         statusCode: 500,
-        message: `${commonConstant.INVALID_TASK_LIST}`,
+        message: `${COMMON_CONSTANT.INVALID_TASK_LIST}`,
         status: status,
       };
       return handleError(response, res);
@@ -250,16 +250,16 @@ const updateTask = async (req, res) => {
      */
     taskList.forEach((task) => {
       if (
-        task.hasOwnProperty(bodyConstant.START_TIME) &&
-        task[bodyConstant.START_TIME] &&
-        task.hasOwnProperty(bodyConstant.END_TIME) &&
-        task[bodyConstant.END_TIME] &&
-        task.hasOwnProperty(bodyConstant.TIME_USED) &&
-        task[bodyConstant.TIME_USED] &&
-        task.hasOwnProperty(bodyConstant.DATE_ADDED) &&
-        task[bodyConstant.DATE_ADDED]
+        task.hasOwnProperty(BODY_CONSTANT.START_TIME) &&
+        task[BODY_CONSTANT.START_TIME] &&
+        task.hasOwnProperty(BODY_CONSTANT.END_TIME) &&
+        task[BODY_CONSTANT.END_TIME] &&
+        task.hasOwnProperty(BODY_CONSTANT.TIME_USED) &&
+        task[BODY_CONSTANT.TIME_USED] &&
+        task.hasOwnProperty(BODY_CONSTANT.DATE_ADDED) &&
+        task[BODY_CONSTANT.DATE_ADDED]
       ) {
-        task[bodyConstant.EMAIL] = userEmailInHeader;
+        task[BODY_CONSTANT.EMAIL] = userEmailInHeader;
         areAllTasksValid = areAllTasksValid && true;
       } else {
         areAllTasksValid = areAllTasksValid && false;
@@ -269,7 +269,7 @@ const updateTask = async (req, res) => {
     /**
      * Sorting the tasklist by the start time
      */
-    taskList = _.sortBy(taskList, bodyConstant.START_TIME);
+    taskList = _.sortBy(taskList, BODY_CONSTANT.START_TIME);
 
     /**
      * Looping over the task list and checking for each task object, and if any discrepancies are found, then returning an error
@@ -278,16 +278,16 @@ const updateTask = async (req, res) => {
       /**
        * Checking if start time is lesser than end time (startTime < endTime) and checking if user provided time used is lesser than or equal to the difference between actual end time and start time (timeUsed <= (endTime - startTime))
        */
-      if (task[bodyConstant.START_TIME] < task[bodyConstant.END_TIME]) {
+      if (task[BODY_CONSTANT.START_TIME] < task[BODY_CONSTANT.END_TIME]) {
         const timeUsed =
           Number(
-            new Date(task[bodyConstant.END_TIME]) -
-              new Date(task[bodyConstant.START_TIME])
+            new Date(task[BODY_CONSTANT.END_TIME]) -
+              new Date(task[BODY_CONSTANT.START_TIME])
           ) / 3600000;
 
         if (
-          task[bodyConstant.TIME_USED] > 0 &&
-          timeUsed >= task[bodyConstant.TIME_USED]
+          task[BODY_CONSTANT.TIME_USED] > 0 &&
+          timeUsed >= task[BODY_CONSTANT.TIME_USED]
         ) {
           areAllTasksValid = areAllTasksValid && true;
         } else {
@@ -312,10 +312,10 @@ const updateTask = async (req, res) => {
          * ---------------------------
          */
         if (
-          taskList[index][bodyConstant.START_TIME] <
-            taskList[index + 1][bodyConstant.START_TIME] &&
-          taskList[index + 1][bodyConstant.START_TIME] <
-            taskList[index][bodyConstant.END_TIME]
+          taskList[index][BODY_CONSTANT.START_TIME] <
+            taskList[index + 1][BODY_CONSTANT.START_TIME] &&
+          taskList[index + 1][BODY_CONSTANT.START_TIME] <
+            taskList[index][BODY_CONSTANT.END_TIME]
         ) {
           areAllTasksValid = areAllTasksValid && false;
         }
@@ -329,28 +329,28 @@ const updateTask = async (req, res) => {
          *
          * @type {date}
          */
-        let currentStartTime = taskList[index][bodyConstant.START_TIME];
+        let currentStartTime = taskList[index][BODY_CONSTANT.START_TIME];
 
         /**
          * This is the ith index's end time
          *
          * @type {date}
          */
-        let currentEndTime = taskList[index][bodyConstant.END_TIME];
+        let currentEndTime = taskList[index][BODY_CONSTANT.END_TIME];
 
         /**
          * This is the i + 1 th index's start time
          *
          * @type {date}
          */
-        let nextStartTime = taskList[index + 1][bodyConstant.START_TIME];
+        let nextStartTime = taskList[index + 1][BODY_CONSTANT.START_TIME];
 
         /**
          * This is the i + 1 th index's end time
          *
          * @type {date}
          */
-        let nextEndTime = taskList[index + 1][bodyConstant.END_TIME];
+        let nextEndTime = taskList[index + 1][BODY_CONSTANT.END_TIME];
 
         /**
          * The variable is updated to hold data if the i th index start and end time are equal to i + 1 th index start and end time
@@ -374,7 +374,7 @@ const updateTask = async (req, res) => {
     if (!areAllTasksValid) {
       response = {
         statusCode: 400,
-        message: `${commonConstant.INVALID_TASK_LIST}`,
+        message: `${COMMON_CONSTANT.INVALID_TASK_LIST}`,
         status: status,
       };
       return handleError(response, res);
@@ -436,7 +436,7 @@ const updateTask = async (req, res) => {
       status = true;
       response = {
         statusCode: 200,
-        message: dbOperationsConstant.DATA_UPDATED,
+        message: DB_OPERATION_CONSTANT.DATA_UPDATED,
         status: status,
       };
 
@@ -445,7 +445,7 @@ const updateTask = async (req, res) => {
     } else {
       response = {
         statusCode: 500,
-        message: `${dbOperationsConstant.UNABLE_TO_ADD_DATA}`,
+        message: `${DB_OPERATION_CONSTANT.UNABLE_TO_ADD_DATA}`,
         status: status,
       };
       return handleError(response, res);
@@ -457,7 +457,7 @@ const updateTask = async (req, res) => {
     logger(error);
     response = {
       statusCode: 500,
-      message: `${commonConstant.GENERIC_ERROR_MESSAGE}`,
+      message: `${COMMON_CONSTANT.GENERIC_ERROR_MESSAGE}`,
       status: status,
     };
     return handleError(response, res);

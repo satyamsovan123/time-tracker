@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 require("dotenv").config();
 
-const { commonConstant } = require("../constants/constant");
+const { COMMON_CONSTANT } = require("../constants/constant");
 
 const { logger } = require("../app/utils/logger");
 
@@ -31,7 +31,7 @@ function connectToDatabase() {
    */
   mongoose.connect(uri, options).then(
     () => {
-      logger(commonConstant.DB_CONNECTION_STATUS_OK);
+      logger(COMMON_CONSTANT.DB_CONNECTION_STATUS_OK);
     },
     (error) => {
       logger(error);

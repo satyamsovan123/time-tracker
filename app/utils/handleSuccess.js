@@ -1,4 +1,4 @@
-const { commonConstant, bodyConstant } = require("../../constants/constant");
+const { COMMON_CONSTANT, BODY_CONSTANT } = require("../../constants/constant");
 
 /**
  * This method receives the success object and sends success object to client,
@@ -25,7 +25,7 @@ const handleSuccess = (success, res, token) => {
    * @type {string}
    * @const
    */
-  const message = success.message || commonConstant.GENERIC_SUCCESS_MESSAGE;
+  const message = success.message || COMMON_CONSTANT.GENERIC_SUCCESS_MESSAGE;
 
   /**
    * This is the status of the verification of the email
@@ -47,7 +47,7 @@ const handleSuccess = (success, res, token) => {
    */
   if (token) {
     return res
-      .cookie(bodyConstant["TIME_TRACKER_TOKEN"], token)
+      .cookie(BODY_CONSTANT["TIME_TRACKER_TOKEN"], token)
       .status(statusCode)
       .json({
         data: data,

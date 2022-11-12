@@ -1,4 +1,4 @@
-const commonConstant = {
+const COMMON_CONSTANT = {
   API_STATUS_OK: "Time Tracker API is working",
   DB_CONNECTION_STATUS_OK: "Connection to Mongo DB is successful",
   INVALID_PATH: "Requested path is invalid",
@@ -18,7 +18,7 @@ const commonConstant = {
   PROD_ENV: "Production",
 };
 
-const dbOperationsConstant = {
+const DB_OPERATION_CONSTANT = {
   DATA_ADDED: "Data added succesfully",
   DATA_RETRIEVED: "Data retrieved succesfully",
   DATA_UPDATED: "Data updated succesfully",
@@ -33,7 +33,7 @@ const dbOperationsConstant = {
   UNABLE_TO_DELETE_DATA: "Unable to delete requested data",
 };
 
-const bodyConstant = {
+const BODY_CONSTANT = {
   BODY: "body",
   EMAIL: "email",
   FIRST_NAME: "firstName",
@@ -50,4 +50,4 @@ const bodyConstant = {
   DATE_ADDED: "dateAdded",
 };
 
-module.exports = { commonConstant, dbOperationsConstant, bodyConstant };
+module.exports = { COMMON_CONSTANT, DB_OPERATION_CONSTANT, BODY_CONSTANT };

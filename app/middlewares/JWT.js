@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 
 const JWTSecretKey = process.env.JWT_SECRET_KEY;
-const { bodyConstant, commonConstant } = require("../../constants/constant");
+const { BODY_CONSTANT, COMMON_CONSTANT } = require("../../constants/constant");
 
 const { handleError, logger } = require("../utils");
 
@@ -50,7 +50,7 @@ const validateJWT = async (req, res, next) => {
    */
   let response = {
     stausCode: 500,
-    message: commonConstant.GENERIC_ERROR_MESSAGE,
+    message: COMMON_CONSTANT.GENERIC_ERROR_MESSAGE,
   };
 
   /**
@@ -63,7 +63,7 @@ const validateJWT = async (req, res, next) => {
      * @type {string}
      * @const
      */
-    const token = req.header(bodyConstant["TIME_TRACKER_TOKEN"]);
+    const token = req.header(BODY_CONSTANT["TIME_TRACKER_TOKEN"]);
 
     /**
      * This is the status of the verification of the token
@@ -77,7 +77,7 @@ const validateJWT = async (req, res, next) => {
      * Checking if the user has a verified token, the call goes to next middleware, else returning an error
      */
     if (verifiedUser) {
-      req[bodyConstant.CURRENT_USER] = verifiedUser;
+      req[BODY_CONSTANT.CURRENT_USER] = verifiedUser;
       return next();
     }
   } catch (error) {
@@ -87,7 +87,7 @@ const validateJWT = async (req, res, next) => {
     logger(error);
     response = {
       statusCode: 401,
-      message: commonConstant.INVALID_JWT,
+      message: COMMON_CONSTANT.INVALID_JWT,
     };
     return handleError(response, res);
   }

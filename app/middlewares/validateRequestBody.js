@@ -1,4 +1,4 @@
-const { commonConstant } = require("../../constants/constant");
+const { COMMON_CONSTANT } = require("../../constants/constant");
 
 const { logger, handleError } = require("../utils");
 
@@ -29,7 +29,7 @@ const validateRequestBody = async (req, res, next) => {
    */
   let response = {
     stausCode: 500,
-    message: commonConstant.GENERIC_ERROR_MESSAGE,
+    message: COMMON_CONSTANT.GENERIC_ERROR_MESSAGE,
   };
 
   /**
@@ -69,7 +69,7 @@ const validateRequestBody = async (req, res, next) => {
 
     response = {
       statusCode: 400,
-      message: commonConstant.INVALID_BODY,
+      message: COMMON_CONSTANT.INVALID_BODY,
       status: status,
     };
     logger(response);
@@ -81,7 +81,7 @@ const validateRequestBody = async (req, res, next) => {
     status = false;
     response = {
       statusCode: 500,
-      message: commonConstant.GENERIC_ERROR_MESSAGE,
+      message: COMMON_CONSTANT.GENERIC_ERROR_MESSAGE,
       status: status,
     };
     logger(response);
