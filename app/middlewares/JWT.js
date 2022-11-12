@@ -10,7 +10,7 @@ const { handleError, logger } = require("../utils");
  *
  * @async This function is asynchronous
  * @param {({_id: ObjectId, email: string, password: string, currentTask: [ObjectId]})} user is the user that is authenticated
- * @returns {string} the JWT containing encrypted user id
+ * @returns {string} the JWT containing encrypted user email
  */
 const generateJWT = async (user) => {
   /**

@@ -5,9 +5,11 @@ require("dotenv").config();
 
 const initializeDatabase = require("./configs/connectToDatabase.js");
 const routes = require("./app/routes");
+const { validateRequestJSON } = require("./app/utils/validateRequestJSON.js");
 
 app.use(cors());
 app.use(express.json());
+app.use(validateRequestJSON);
 app.use(routes);
 
 /**

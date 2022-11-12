@@ -3,6 +3,7 @@ const { handleError } = require("./handleError");
 const { handleSuccess } = require("./handleSuccess");
 const { validateAlphaNumericString } = require("./validateAlphaNumericString");
 const { validateEmail } = require("./validateEmail");
+const { validateRequestJSON } = require("./validateRequestJSON");
 
 module.exports = {
   handleError,
@@ -10,4 +11,5 @@ module.exports = {
   logger,
   validateEmail,
   validateAlphaNumericString,
+  validateRequestJSON,
 };
