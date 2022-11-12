@@ -127,7 +127,6 @@ const profile = async (req, res) => {
      * Incase of any errors in the try block, a generic error message is returned to the user and error is logged to the console
      */
     logger(error);
-    status = false;
     response = {
       statusCode: 500,
       message: `${commonConstant.GENERIC_ERROR_MESSAGE}`,
