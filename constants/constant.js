@@ -16,6 +16,14 @@ const COMMON_CONSTANT = {
   AUTHENTICATION_UNSUCCESSFUL: "Authentication is unsuccessful",
   DEV_ENV: "Development",
   PROD_ENV: "Production",
+  DEFAULT_COMMENT:
+    "There is no data, please fillup something to generate insights.",
+  GREAT_COMMENT:
+    "Well done! You've utilised your time very well. Keep up the good work!",
+  OKAY_COMMENT:
+    "You've utilised most of your time, but try to remain focused and try a bit harder next time!",
+  NEED_TO_IMPROVE_COMMENT:
+    "Oh, Uh! It looks like you were not able to focus today. You should try harder next time!",
 };
 
 const DB_OPERATION_CONSTANT = {

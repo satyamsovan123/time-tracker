@@ -1,4 +1,4 @@
-const { Task, User } = require("../../models");
+const { Task, User, Insight } = require("../../models");
 
 const {
   BODY_CONSTANT,
@@ -219,7 +219,7 @@ const deleteProfile = async (req, res) => {
     logger(existingUser);
 
     /**
-     * Checking if the user doesn't exists or if the deletion was not successful, then returning an error, else also deleting all the tasks related to the same user and sending back the user document
+     * Checking if the user doesn't exists or if the deletion was not successful, then returning an error, else also deleting all the tasks related to the same user and deleting all the details related to the user
      */
     if (!existingUser || existingUser.deletedCount === 0) {
       response = {
@@ -229,7 +229,15 @@ const deleteProfile = async (req, res) => {
       };
       return handleError(response, res);
     } else {
+      /**
+       * Deleting the tasks related to user
+       */
       await Task.deleteMany({ email: userEmailInHeader });
+      /**
+       * Deleting the details related to user
+       */
+      await Insight.deleteMany({ email: userEmailInHeader });
+
       status = true;
       response = {
         statusCode: 200,

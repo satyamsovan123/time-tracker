@@ -230,6 +230,26 @@ const updateTask = async (req, res) => {
     }
 
     /**
+     * This is the user document that is fetched after querying from the database
+     *
+     * @type {({_id: ObjectId, email: string, password: string, currentTask: [ObjectId]}|null)}
+     * @const
+     */
+    const existingUser = await User.findOne({ email: userEmailInHeader });
+
+    /**
+     * Checking if the user doesn't exists, then returning an error
+     */
+    if (!existingUser) {
+      response = {
+        statusCode: 404,
+        message: `${DB_OPERATION_CONSTANT.USER_DOESNT_EXIST}`,
+        status: status,
+      };
+      return handleError(response, res);
+    }
+
+    /**
      * The tasklist is updated with the details provided by the user
      */
     taskList = req.body[BODY_CONSTANT["TASK_LIST"]];
@@ -278,10 +298,10 @@ const updateTask = async (req, res) => {
      */
     taskList.forEach((task, index) => {
       /**
-       * Checking if start time is lesser than end time (startTime < endTime) and checking if user provided time used is lesser than or equal to the difference between actual end time and start time (timeUsed <= (endTime - startTime))
+       * Checking if start time is lesser than end time (startTime < endTime) and checking if user provided time used is lesser than or equal to the difference between actual end time and start time (maximumDuration <= (endTime - startTime))
        */
       if (task[BODY_CONSTANT.START_TIME] < task[BODY_CONSTANT.END_TIME]) {
-        const timeUsed =
+        const maximumDuration =
           Number(
             new Date(task[BODY_CONSTANT.END_TIME]) -
               new Date(task[BODY_CONSTANT.START_TIME])
@@ -289,7 +309,7 @@ const updateTask = async (req, res) => {
 
         if (
           task[BODY_CONSTANT.TIME_USED] > 0 &&
-          timeUsed >= task[BODY_CONSTANT.TIME_USED]
+          maximumDuration >= task[BODY_CONSTANT.TIME_USED]
         ) {
           areAllTasksValid = areAllTasksValid && true;
         } else {

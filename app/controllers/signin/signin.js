@@ -17,10 +17,11 @@ const {
   validateEmail,
 } = require("../../utils");
 const { generateJWT } = require("../../middlewares/JWT");
+const { processInsight } = require("../insight");
 
 /**
  * This method verifies user provided credentials, by validating email and password in the request body
- * and then checking for the user existence. Then the entered plaintext password and hased databased passwords are matched using bycrypt
+ * and then checking for the user existence. Then the entered plaintext password and hased databased passwords are matched using bcrypt
  *
  * @requires {@link handleError}
  * @requires {@link handleSuccess}
@@ -176,14 +177,12 @@ const signin = async (req, res) => {
       /**
        * This is the task list for the logged in user, it has startTime, endTime and dateAdded in UTC format (we need to convert it)
        *
-       * @type {({_id: ObjectId, email: string, startTime: Date, endTime: Date, dateAdded: Date, timeUsed: string}|null)}
+       * @type {({_id: ObjectId, startTime: Date, endTime: Date, dateAdded: Date, timeUsed: string}|null)}
        * @const
        */
       const taskList = await Task.find({
         email: existingUser[BODY_CONSTANT.EMAIL],
       });
-
-      logger(taskList);
 
       /**
        * This is the task list id list for the logged in user that will be updated later
@@ -193,12 +192,20 @@ const signin = async (req, res) => {
       let taskIdList = [];
 
       /**
+       * This is the backup of the task list, which will store expired tasks
+       *
+       * @type {[]}
+       */
+      let backupOfTaskList = [];
+
+      /**
        * Checking if task list has some tasks in it i.e if the length of the task list that is fetched from database, is more than 0
        */
       if (taskList && taskList.length > 0) {
         /**
+         * NOTE: Since, all these things are done everytime, so signup slows down!
          * On every login, looping through each task and checking if the created tasks are expired
-         * Date comes from client as local time zone (say IST), but MongoDB stores dates in UTC, so converting UTC to local time zone
+         * the date comes from client as local time zone (say IST), but MongoDB stores dates in UTC, so converting UTC to local time zone and checking if task is expired (i.e. dateAdded < currentDate), also pushing these old tasks in a backup variable, which will be used to process and store information
          */
         taskList.forEach(async (task) => {
           /**
@@ -222,14 +229,20 @@ const signin = async (req, res) => {
           );
 
           /**
-           * Checking if the current time is more that the date added for the current task, then deleting the tasks, else if the task are not expired for current date, then those task ids are preserved, to update corresponding user document
+           * Checking if the current time is more that the date added for the current task, then taking backup of the task (by pushing it to an array) and then deleting the tasks, else if the task are not expired for current date, then those task ids are preserved, to update corresponding user document
            */
           if (dateAddedLocalTimeZone < currentDateLocalTimeZone) {
+            backupOfTaskList.push(task);
             await Task.findByIdAndDelete(task._id);
           } else {
             taskIdList.push(task._id);
           }
         });
+
+        /**
+         * Checking if backup of expired task list is completed (which means there were some expired tasks, which needs procesing), then calling this method to process the list of expired data, that would be used to populate dashboard
+         */
+        if (backupOfTaskList.length) await processInsight(backupOfTaskList);
 
         /**
          * Updating the user document with new task ids
