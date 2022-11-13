@@ -3,8 +3,8 @@ const { ObjectId } = mongoose.Schema.Types;
 
 const taskSchema = new mongoose.Schema({
   email: { type: String, required: true },
-  startTime: { type: Date, required: true, unique: true },
-  endTime: { type: Date, required: true, unique: true },
+  startTime: { type: Date, required: true },
+  endTime: { type: Date, required: true },
   timeUsed: { type: String, required: true },
   dateAdded: { type: Date, required: true },
 });

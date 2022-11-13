@@ -27,7 +27,7 @@ const handleError = (error, res) => {
   const message = error.message || COMMON_CONSTANT.GENERIC_ERROR_MESSAGE;
 
   /**
-   * This is the status of the verification of the email
+   * This is the status of the action that is currently happening
    *
    * @type {boolean}
    */

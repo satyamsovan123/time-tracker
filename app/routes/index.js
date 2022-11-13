@@ -1,5 +1,6 @@
 const express = require("express");
 const { COMMON_CONSTANT } = require("../../constants/constant");
+const { handleSuccess, handleError } = require("../utils");
 const router = express.Router();
 const baseURL = "/api/";
 
@@ -10,11 +11,21 @@ router.use(baseURL, require("./task"));
 router.use(baseURL, require("./insight"));
 
 router.get("/", (req, res) => {
-  res.status(200).json({ message: COMMON_CONSTANT.API_STATUS_OK });
+  response = {
+    statusCode: 200,
+    message: `${COMMON_CONSTANT.API_STATUS_OK}`,
+    status: true,
+  };
+  return handleSuccess(response, res);
 });
 
 router.use("*", (req, res) => {
-  res.status(404).json({ message: COMMON_CONSTANT.INVALID_PATH });
+  response = {
+    statusCode: 500,
+    message: `${COMMON_CONSTANT.INVALID_PATH}`,
+    status: false,
+  };
+  return handleError(response, res);
 });
 
 module.exports = router;

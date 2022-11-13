@@ -28,11 +28,11 @@ const handleSuccess = (success, res, token) => {
   const message = success.message || COMMON_CONSTANT.GENERIC_SUCCESS_MESSAGE;
 
   /**
-   * This is the status of the verification of the email
+   * This is the status of the action that is currently happening
    *
    * @type {boolean}
    */
-  const status = success.status || true;
+  const status = success.status;
 
   /**
    * This is the data that would be sent to client as success response
