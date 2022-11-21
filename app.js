@@ -20,4 +20,4 @@ initializeDatabase.connectToDatabase();
 /**
  * Starting the application using a port
  */
-app.listen(process.env.PORT);
+app.listen(process.env.PORT || 3000);

@@ -10,8 +10,18 @@ router.use(baseURL, require("./signin"));
 router.use(baseURL, require("./task"));
 router.use(baseURL, require("./insight"));
 
+/**
+ * This middleware function is handling the base route for it's used for quick testing and welcome
+ */
 router.get("/", (req, res) => {
-  response = {
+  /**
+   * This is the response that is sent to client
+   *
+   * @type {{statusCode: number, message: string, status: status}}
+   * @const
+   *
+   */
+  const response = {
     statusCode: 200,
     message: `${COMMON_CONSTANT.API_STATUS_OK}`,
     status: true,
@@ -19,9 +29,19 @@ router.get("/", (req, res) => {
   return handleSuccess(response, res);
 });
 
+/**
+ * This middleware function is handling the error routes and the invalid routes
+ */
 router.use("*", (req, res) => {
-  response = {
-    statusCode: 500,
+  /**
+   * This is the response that is sent to client
+   *
+   * @type {{statusCode: number, message: string, status: status}}
+   * @const
+   *
+   */
+  const response = {
+    statusCode: 400,
     message: `${COMMON_CONSTANT.INVALID_PATH}`,
     status: false,
   };
