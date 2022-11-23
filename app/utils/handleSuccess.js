@@ -55,11 +55,11 @@ const handleSuccess = (success, res, token) => {
     const afterTwoDays = 2 * 24 * 3600 * 1000;
     return res
       .cookie(BODY_CONSTANT["TIME_TRACKER_TOKEN"], token, {
-        httpOnly: false,
+        httpOnly: true,
         secure: true,
-        sameSite: "None",
+        // sameSite: "None",
         // secure: false,
-        // sameSite: false,
+        sameSite: false,
         path: "/",
         maxAge: afterTwoDays,
         // expires: new Date(Date.now() + afterTwoDays),
