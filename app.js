@@ -8,15 +8,25 @@ const routes = require("./app/routes");
 const { validateRequestJSON } = require("./app/utils/validateRequestJSON.js");
 
 // app.use(cors());
-app.use(
-  cors({
-    credentials: true,
-    origin: [
-      process.env.FRONTEND_DEVELOPMENT_URL,
-      process.env.FRONTEND_PRODUCTION_URL,
-    ],
-  })
-);
+// app.use(
+//   cors({
+//     credentials: true,
+//     origin: [
+//       process.env.FRONTEND_DEVELOPMENT_URL,
+//       process.env.FRONTEND_PRODUCTION_URL,
+//     ],
+//   })
+// );
+
+app.use(function (req, res, next) {
+  res.setHeader(
+    "Access-Control-Allow-Origin",
+    process.env.FRONTEND_PRODUCTION_URL
+  );
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, DELETE");
+  next();
+});
+
 app.use(express.json());
 app.use(validateRequestJSON);
 app.use(routes);
