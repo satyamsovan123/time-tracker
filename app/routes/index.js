@@ -7,6 +7,7 @@ const baseURL = "/api/";
 router.use(baseURL, require("./profile"));
 router.use(baseURL, require("./signup"));
 router.use(baseURL, require("./signin"));
+router.use(baseURL, require("./signout"));
 router.use(baseURL, require("./task"));
 router.use(baseURL, require("./insight"));
 
