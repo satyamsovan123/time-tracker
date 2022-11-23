@@ -7,10 +7,15 @@ const initializeDatabase = require("./configs/connectToDatabase.js");
 const routes = require("./app/routes");
 const { validateRequestJSON } = require("./app/utils/validateRequestJSON.js");
 
+const originForCORS =
+  process.env.NODE_ENV === process.env.FRONTEND_PRODUCTION_URL
+    ? process.env.FRONTEND_PRODUCTION_URL
+    : process.env.FRONTEND_DEVELOPMENT_URL;
+
 // app.use(cors());
 app.use(
   cors({
-    origin: process.env.FRONTEND_PRODUCTION_URL,
+    origin: originForCORS,
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
