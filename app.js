@@ -24,6 +24,12 @@ app.use(function (req, res, next) {
     process.env.FRONTEND_PRODUCTION_URL
   );
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, DELETE");
+  res.setHeader("Access-Control-Allow-Credentials", true);
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "X-Requested-With,content-type"
+  );
+
   next();
 });
 
