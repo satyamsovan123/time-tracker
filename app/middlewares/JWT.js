@@ -60,7 +60,6 @@ const validateJWT = async (req, res, next) => {
     /**
      * Checking if cookie is not present in the request header
      */
-    console.log("sada", req.cookies);
     if (!req.cookies.hasOwnProperty(BODY_CONSTANT.TIME_TRACKER_TOKEN)) {
       response = {
         statusCode: 401,
@@ -75,8 +74,7 @@ const validateJWT = async (req, res, next) => {
      * @type {string}
      * @const
      */
-    // const token = req.header(BODY_CONSTANT["TIME_TRACKER_TOKEN"]);
-    const token = req.cookies.BODY_CONSTANT["TIME_TRACKER_TOKEN"];
+    const token = req.cookies[BODY_CONSTANT["TIME_TRACKER_TOKEN"]];
 
     /**
      * This is the status of the verification of the token

@@ -20,12 +20,6 @@ const originForCORS =
     ? process.env.FRONTEND_PRODUCTION_URL
     : process.env.FRONTEND_DEVELOPMENT_URL;
 
-console.log(
-  process.env.NODE_ENV,
-  COMMON_CONSTANT.PROD_ENV,
-  originForCORS,
-  process.env.NODE_ENV === COMMON_CONSTANT.PROD_ENV
-);
 // app.use(cors());
 
 app.use(cookieParser());
