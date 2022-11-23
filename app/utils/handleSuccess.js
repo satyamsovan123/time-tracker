@@ -62,7 +62,7 @@ const handleSuccess = (success, res, token) => {
         // sameSite: false,
         path: "/",
         maxAge: afterTwoDays,
-        expires: new Date(Date.now() + afterTwoDays),
+        // expires: new Date(Date.now() + afterTwoDays),
       })
       .status(statusCode)
       .json({
