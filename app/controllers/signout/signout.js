@@ -41,8 +41,17 @@ const signout = async (req, res) => {
    * To avoid any errors, the entire code is placed in try catch block
    */
   try {
-    res.clearCookie(BODY_CONSTANT.TIME_TRACKER_TOKEN);
-
+    /**
+     * Instead of cleearing cookie, manually setting the cookie to hold empty string ""
+     */
+    // res.clearCookie(BODY_CONSTANT.TIME_TRACKER_TOKEN);
+    res.cookie(BODY_CONSTANT["TIME_TRACKER_TOKEN"], "", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      path: "/",
+      maxAge: new Date(),
+    });
     response = {
       statusCode: 200,
       message: COMMON_CONSTANT.SIGNOUT_SUCCESSFUL,
