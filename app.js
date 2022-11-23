@@ -28,7 +28,7 @@ console.log(
 // app.use(cors());
 app.use(
   cors({
-    origin: "https://time-tracker-ui.web.app",
+    origin: ["https://time-tracker-ui.web.app", "http://localhost:4200"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
