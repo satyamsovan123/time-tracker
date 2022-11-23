@@ -46,13 +46,28 @@ const handleSuccess = (success, res, token) => {
    * Checking if the token is sent by the callee (for /singup and /signin), then token is sent as cookie to client along with the sucess response body, else only response body is sent
    */
   if (token) {
+    /**
+     * This is the expiration time i.e. after two days
+     *
+     * @type {({}|null)}
+     * @const
+     */
+    const afterTwoDays = 2 * 24 * 3600 * 1000;
     return res
-      .cookie(BODY_CONSTANT["TIME_TRACKER_TOKEN"], token)
+      .cookie(BODY_CONSTANT["TIME_TRACKER_TOKEN"], token, {
+        secure: true,
+        httpOnly: true,
+        path: "/",
+        maxAge: afterTwoDays,
+        expires: new Date(Date.now() + afterTwoDays),
+        // sameSite: "Strict",
+      })
       .status(statusCode)
       .json({
         data: data,
         message: message,
         status: status,
+        sameSite: "secure",
       });
   }
 
