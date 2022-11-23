@@ -57,20 +57,19 @@ const handleSuccess = (success, res, token) => {
 
     return (
       res
-        // .cookie(BODY_CONSTANT["TIME_TRACKER_TOKEN"], token, {
-        //   httpOnly: true,
-        //   secure: true,
-        //   sameSite: "Strict",
-        //   // secure: false,
-        //   // sameSite: false,
-        //   path: "/",
-        //   maxAge: afterTwoDays,
-        //   // expires: new Date(Date.now() + afterTwoDays),
-        // })
-        .setHeader("Set-Cookie", [
-          `${BODY_CONSTANT["TIME_TRACKER_TOKEN"]}=${token}; Expires=${afterTwoDays}; HttpOnly; Secure`,
-          "lang=js; HttpOnly; Secure",
-        ])
+        .cookie(BODY_CONSTANT["TIME_TRACKER_TOKEN"], token, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "Strict",
+          // secure: false,
+          // sameSite: false,
+          path: "/",
+          maxAge: afterTwoDays,
+          // expires: new Date(Date.now() + afterTwoDays),
+        })
+        // .setHeader("Set-Cookie", [
+        //   `${BODY_CONSTANT["TIME_TRACKER_TOKEN"]}=${token}; Expires=${afterTwoDays}; HttpOnly; Secure`,
+        // ])
         .status(statusCode)
         .json({
           data: data,
