@@ -60,6 +60,7 @@ const validateJWT = async (req, res, next) => {
     /**
      * Checking if cookie is not present in the request header
      */
+    console.log("sada", req.cookies);
     if (!req.cookies.hasOwnProperty(BODY_CONSTANT.TIME_TRACKER_TOKEN)) {
       response = {
         statusCode: 401,

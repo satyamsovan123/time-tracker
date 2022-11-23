@@ -1,26 +1,17 @@
 const {
   COMMON_CONSTANT,
-  DB_OPERATION_CONSTANT,
   BODY_CONSTANT,
 } = require("../../../constants/constant");
 
-const {
-  handleError,
-  handleSuccess,
-  logger,
-  validateEmail,
-} = require("../../utils");
-const { generateJWT } = require("../../middlewares/JWT");
-const { processInsight } = require("../insight");
+const { handleError, handleSuccess, logger } = require("../../utils");
 
 /**
- * This method verifies user provided credentials, by validating email and password in the request body
- * and then checking for the user existence. Then the entered plaintext password and hased databased passwords are matched using bcrypt
+ * This method signs out the user, by deleting the cookie
+ * It sends the request to browser to delete the associated cookie
  *
  * @requires {@link handleError}
  * @requires {@link handleSuccess}
  * @requires {@link logger}
- * @requires {@link validateEmail}
  *
  * @async This function is asynchronous
  * @param {{}} req is the request body object that is received by server
