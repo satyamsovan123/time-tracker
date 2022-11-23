@@ -56,9 +56,9 @@ const handleSuccess = (success, res, token) => {
     return res
       .cookie(BODY_CONSTANT["TIME_TRACKER_TOKEN"], token, {
         httpOnly: true,
-        secure: true,
+        // secure: true,
         // sameSite: "None",
-        // secure: false,
+        secure: false,
         sameSite: false,
         path: "/",
         maxAge: afterTwoDays,
