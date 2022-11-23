@@ -24,7 +24,7 @@ app.use(function (req, res, next) {
     "https://time-tracker-ui.web.app"
   );
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, DELETE");
-  //   res.setHeader("Access-Control-Allow-Credentials", true);
+  res.setHeader("Access-Control-Allow-Credentials", true);
   res.setHeader(
     "Access-Control-Allow-Headers",
     "X-Requested-With,content-type"
