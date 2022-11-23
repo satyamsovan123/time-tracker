@@ -58,12 +58,24 @@ const validateJWT = async (req, res, next) => {
    */
   try {
     /**
+     * Checking if cookie is not present in the request header
+     */
+    if (!req.cookies.hasOwnProperty(BODY_CONSTANT.TIME_TRACKER_TOKEN)) {
+      response = {
+        statusCode: 401,
+        message: COMMON_CONSTANT.INVALID_JWT,
+      };
+      return handleError(response, res);
+    }
+
+    /**
      * This is the token that is received from request header sent by client
      *
      * @type {string}
      * @const
      */
-    const token = req.header(BODY_CONSTANT["TIME_TRACKER_TOKEN"]);
+    // const token = req.header(BODY_CONSTANT["TIME_TRACKER_TOKEN"]);
+    const token = req.cookies.BODY_CONSTANT["TIME_TRACKER_TOKEN"];
 
     /**
      * This is the status of the verification of the token
