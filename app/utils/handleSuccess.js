@@ -60,7 +60,7 @@ const handleSuccess = (success, res, token) => {
         .cookie(BODY_CONSTANT["TIME_TRACKER_TOKEN"], token, {
           httpOnly: true,
           secure: true,
-          sameSite: "Strict",
+          sameSite: "None",
           // secure: false,
           // sameSite: false,
           path: "/",
