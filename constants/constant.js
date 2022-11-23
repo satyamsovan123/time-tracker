@@ -14,8 +14,8 @@ const COMMON_CONSTANT = {
   UNABLE_TO_PROCESS_DATA: "Unable to process data",
   AUTHENTICATION_SUCCESSFUL: "Authentication is successful",
   AUTHENTICATION_UNSUCCESSFUL: "Authentication is unsuccessful",
-  DEV_ENV: "Development",
-  PROD_ENV: "Production",
+  DEV_ENV: "development",
+  PROD_ENV: "production",
   DEFAULT_COMMENT:
     "There is no data, please fillup something to generate insights.",
   GREAT_COMMENT:

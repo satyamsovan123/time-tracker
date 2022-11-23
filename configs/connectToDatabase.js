@@ -31,6 +31,7 @@ function connectToDatabase() {
    */
   mongoose.connect(uri, options).then(
     () => {
+      console.log(process.env.NODE_ENV);
       logger(COMMON_CONSTANT.DB_CONNECTION_STATUS_OK);
     },
     (error) => {
