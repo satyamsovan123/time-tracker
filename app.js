@@ -1,4 +1,5 @@
 const express = require("express");
+const cookieParser = require("cookie-parser");
 const app = express();
 const cors = require("cors");
 require("dotenv").config();
@@ -26,6 +27,9 @@ console.log(
   process.env.NODE_ENV === COMMON_CONSTANT.PROD_ENV
 );
 // app.use(cors());
+
+app.use(cookieParser());
+
 app.use(
   cors({
     origin: ["https://time-tracker-ui.web.app", "http://localhost:4200"],

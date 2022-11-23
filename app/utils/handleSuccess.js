@@ -1,4 +1,5 @@
 const { COMMON_CONSTANT, BODY_CONSTANT } = require("../../constants/constant");
+const cookieParser = require("cookie-parser");
 
 /**
  * This method receives the success object and sends success object to client,
