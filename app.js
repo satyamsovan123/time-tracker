@@ -23,9 +23,7 @@ const { validateRequestJSON } = require("./app/utils/validateRequestJSON.js");
 app.use(function (req, res, next) {
   res.setHeader(
     "Access-Control-Allow-Origin",
-    process.env.NODE_ENV === process.env.FRONTEND_PRODUCTION_URL
-      ? process.env.FRONTEND_PRODUCTION_URL
-      : process.env.FRONTEND_DEVELOPMENT_URL
+    "https://time-tracker-ui.web.app"
   );
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, DELETE");
   res.setHeader("Access-Control-Allow-Credentials", true);
