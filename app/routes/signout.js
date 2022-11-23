@@ -3,6 +3,6 @@ const router = express.Router();
 const { signout } = require("../controllers/signout");
 const { validateJWT } = require("../middlewares/JWT");
 
-router.post("/signout", validateJWT, signout);
+router.get("/signout", validateJWT, signout);
 
 module.exports = router;
