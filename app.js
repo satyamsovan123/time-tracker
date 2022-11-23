@@ -10,15 +10,14 @@ const { validateRequestJSON } = require("./app/utils/validateRequestJSON.js");
 // app.use(cors());
 app.use(
   cors({
-    origin: process.env.FRONTEND_PRODUCTION_URL,
+    origin:
+      process.env.NODE_ENV === process.env.FRONTEND_PRODUCTION_URL
+        ? process.env.FRONTEND_PRODUCTION_URL
+        : process.env.FRONTEND_DEVELOPMENT_URL,
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
 );
-
-// origin: process.env.NODE_ENV === process.env.FRONTEND_PRODUCTION_URL
-//   ? process.env.FRONTEND_PRODUCTION_URL
-//   : process.env.FRONTEND_DEVELOPMENT_URL,
 
 // app.use(function (req, res, next) {
 //   res.setHeader(
