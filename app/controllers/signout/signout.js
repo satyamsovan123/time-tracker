@@ -42,7 +42,7 @@ const signout = async (req, res) => {
    */
   try {
     /**
-     * Instead of cleearing cookie, manually setting the cookie to hold empty string ""
+     * Instead of clearing cookie, manually setting the cookie to hold empty string "" and setting expiry time to past
      */
     // res.clearCookie(BODY_CONSTANT.TIME_TRACKER_TOKEN);
     res.cookie(BODY_CONSTANT["TIME_TRACKER_TOKEN"], "", {
@@ -50,7 +50,7 @@ const signout = async (req, res) => {
       secure: true,
       sameSite: "None",
       path: "/",
-      maxAge: new Date(),
+      maxAge: new Date(null),
     });
     response = {
       statusCode: 200,
