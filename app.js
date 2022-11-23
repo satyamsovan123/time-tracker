@@ -28,7 +28,7 @@ console.log(
 // app.use(cors());
 app.use(
   cors({
-    origin: originForCORS,
+    origin: process.env.FRONTEND_PRODUCTION_URL,
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
