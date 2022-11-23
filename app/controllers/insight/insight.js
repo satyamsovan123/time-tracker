@@ -14,7 +14,7 @@ const {
 } = require("../../utils");
 
 /**
- * This method returns the details for an authenticated user
+ * This method returns the insights for the requested authenticated user
  *
  * @requires {@link handleError}
  * @requires {@link handleSuccess}
@@ -26,7 +26,7 @@ const {
  * @param {{}} res is the response body that will be sent to client
  * @returns {{message: string, status: boolean}} success response with data or error response object based on various criterias
  */
-const profile = async (req, res) => {
+const getInsight = async (req, res) => {
   /**
    * This is the status of the current operation
    *
@@ -90,38 +90,25 @@ const profile = async (req, res) => {
     }
 
     /**
-     * This is the user document that is fetched after querying from the database (only selecting required properties)
+     * These are the insight documents that is fetched after querying from the database
      *
-     * @type {({_id: ObjectId, email: string, password: string, currentTask: [ObjectId]}|null)}
+     * @type {({_id: ObjectId, email: string, dateAdded: Date, totalTimeLogged: string, timeUsed: string, percentageUsed: string, comment: string}|null)}
      * @const
      */
-    const existingUser = await User.findOne({
+    const userInsights = await Insight.find({
       email: userEmailInHeader,
-    }).select("-_id firstName lastName currentTask");
+    }).select("-_id");
 
-    logger(existingUser);
+    logger(userInsights);
 
-    /**
-     * Checking if the user doesn't exists, then returning an error, else returning back the user document
-     */
-    if (!existingUser) {
-      response = {
-        statusCode: 404,
-        message: `${DB_OPERATION_CONSTANT.USER_DOESNT_EXIST}`,
-        status: status,
-      };
-      return handleError(response, res);
-    } else {
-      status = true;
-
-      response = {
-        data: existingUser,
-        statusCode: 200,
-        message: DB_OPERATION_CONSTANT.DATA_RETRIEVED,
-        status: status,
-      };
-      return handleSuccess(response, res);
-    }
+    status = true;
+    response = {
+      data: userInsights,
+      statusCode: 200,
+      message: DB_OPERATION_CONSTANT.DATA_RETRIEVED,
+      status: status,
+    };
+    return handleSuccess(response, res);
   } catch (error) {
     /**
      * Incase of any errors in the try block, a generic error message is returned to the user and error is logged to the console
@@ -137,7 +124,7 @@ const profile = async (req, res) => {
 };
 
 /**
- * This method deletes the user and the realted details from the database
+ * This method deletes the insight requested by the client for a authenticated user
  *
  * @requires {@link handleError}
  * @requires {@link handleSuccess}
@@ -147,17 +134,19 @@ const profile = async (req, res) => {
  * @async This function is asynchronous
  * @param {{}} req is the request body that is received by server, it has email in the req.body and userEmailInHeader (custom property) passed by the validateJWT middleware
  * @param {{}} res is the response body that will be sent to client
- * @returns {{message: string, status: boolean}} success response or error response object based on various criterias
+ * @returns {{message: string, status: boolean}} success response with data or error response object based on various criterias
  */
-const deleteProfile = async (req, res) => {
+const deleteInsight = async (req, res) => {
   /**
    * This is the status of the current operation
+   *
    * @type {boolean}
    */
   let status = false;
 
   /**
    * This is the response that is sent to client
+   *
    * @type {{statusCode: number, message: string, status: status}}
    */
   let response = {
@@ -172,10 +161,19 @@ const deleteProfile = async (req, res) => {
   try {
     /**
      * This is the email passed by the client in request body
+     *
      * @type {string}
      * @const
      */
     const email = req.body[BODY_CONSTANT.EMAIL];
+
+    /**
+     * This is the dateAdded property passed by the client in request body
+     *
+     * @type {string}
+     * @const
+     */
+    const dateAdded = req.body[BODY_CONSTANT.DATE_ADDED];
 
     /**
      * This is the email passed the validateJWT middleware
@@ -188,6 +186,7 @@ const deleteProfile = async (req, res) => {
 
     /**
      * This is the status of the validity of email passed by client in request body
+     *
      * @type {boolean}
      * @const
      */
@@ -209,43 +208,46 @@ const deleteProfile = async (req, res) => {
     }
 
     /**
-     * This is the count of the documents that were deleted after querying from the database (it should be 1 in this case)
-     *
-     * @type {({acknowledged: string, deletedCount: number}|undefined)}
-     * @const
+     * Checking if the dateAdded property from the request body is not valid
      */
-    const existingUser = await User.deleteOne({ email: userEmailInHeader });
-
-    logger(existingUser);
-
-    /**
-     * Checking if the user doesn't exists or if the deletion was not successful, then returning an error, else also deleting all the tasks related to the same user and deleting all the details related to the user
-     */
-    if (!existingUser || existingUser.deletedCount === 0) {
+    if (!dateAdded) {
       response = {
-        statusCode: 404,
-        message: `${DB_OPERATION_CONSTANT.USER_DOESNT_EXIST}`,
+        statusCode: 401,
+        message: `${COMMON_CONSTANT.REQUIRED_FIELD_BLANK}`,
         status: status,
       };
       return handleError(response, res);
-    } else {
-      /**
-       * Deleting the tasks related to user
-       */
-      await Task.deleteMany({ email: userEmailInHeader });
-      /**
-       * Deleting the details related to user
-       */
-      await Insight.deleteMany({ email: userEmailInHeader });
+    }
 
-      status = true;
+    /**
+     * Deleting the required insight document by searching by the date added and email
+     */
+    const deletedInsight = await Insight.deleteOne({
+      email: userEmailInHeader,
+      dateAdded: dateAdded,
+    });
+
+    logger(deletedInsight);
+
+    /**
+     * Checking if no data was deleted, then returning no data found in database
+     */
+    if (!deletedInsight || deletedInsight.deletedCount === 0) {
       response = {
-        statusCode: 200,
-        message: DB_OPERATION_CONSTANT.DATA_DELETED,
+        statusCode: 404,
+        message: DB_OPERATION_CONSTANT.UNABLE_TO_RETRIEVE_DATA,
         status: status,
       };
       return handleSuccess(response, res);
     }
+
+    status = true;
+    response = {
+      statusCode: 200,
+      message: DB_OPERATION_CONSTANT.DATA_DELETED,
+      status: status,
+    };
+    return handleSuccess(response, res);
   } catch (error) {
     /**
      * Incase of any errors in the try block, a generic error message is returned to the user and error is logged to the console
@@ -260,4 +262,4 @@ const deleteProfile = async (req, res) => {
   }
 };
 
-module.exports = { profile, deleteProfile };
+module.exports = { deleteInsight, getInsight };
