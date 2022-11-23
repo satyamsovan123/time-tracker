@@ -24,6 +24,7 @@ const COMMON_CONSTANT = {
     "You've utilised most of your time, but try to remain focused and try a bit harder next time!",
   NEED_TO_IMPROVE_COMMENT:
     "Oh, Uh! It looks like you were not able to focus today. You should try harder next time!",
+  SIGNOUT_SUCCESSFUL: "Sign out is successful.",
 };
 
 const DB_OPERATION_CONSTANT = {
