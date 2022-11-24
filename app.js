@@ -29,6 +29,7 @@ app.use(
     origin: ["https://time-tracker-ui.web.app", "http://localhost:4200"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
+    exposedHeaders: ["cookie", "set-cookie"],
   })
 );
 
