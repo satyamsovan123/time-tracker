@@ -56,6 +56,7 @@ const handleSuccess = (success, res, token) => {
     const afterTwoDays = 2 * 24 * 3600 * 1000;
 
     return res
+      .setHeader(BODY_CONSTANT["TIME_TRACKER_TOKEN"], token)
       .cookie(BODY_CONSTANT["TIME_TRACKER_TOKEN"], token, {
         httpOnly: true,
         secure: true,
