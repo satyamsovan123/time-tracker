@@ -55,23 +55,25 @@ const handleSuccess = (success, res, token) => {
      */
     const afterTwoDays = 2 * 24 * 3600 * 1000;
 
-    return res
-      .setHeader(BODY_CONSTANT["TIME_TRACKER_TOKEN"], token)
-      .cookie(BODY_CONSTANT["TIME_TRACKER_TOKEN"], token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "None",
-        // secure: false,
-        // sameSite: false,
-        path: "/",
-        maxAge: afterTwoDays,
-      })
-      .status(statusCode)
-      .json({
-        data: data,
-        message: message,
-        status: status,
-      });
+    return (
+      res
+        .setHeader(BODY_CONSTANT["ACCESS_TOKEN"], token)
+        // .cookie(BODY_CONSTANT["ACCESS_TOKEN"], token, {
+        //   httpOnly: true,
+        //   secure: true,
+        //   sameSite: "None",
+        //   // secure: false,
+        //   // sameSite: false,
+        //   path: "/",
+        //   maxAge: afterTwoDays,
+        // })
+        .status(statusCode)
+        .json({
+          data: data,
+          message: message,
+          status: status,
+        })
+    );
   }
 
   return res.status(statusCode).json({

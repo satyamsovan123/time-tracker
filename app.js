@@ -20,16 +20,17 @@ const originForCORS =
     ? process.env.FRONTEND_PRODUCTION_URL
     : process.env.FRONTEND_DEVELOPMENT_URL;
 
-// app.use(cors());
-
 app.use(cookieParser());
 
 app.use(
   cors({
-    origin: ["https://time-tracker-ui.web.app", "http://localhost:4200"],
+    origin: [
+      process.env.FRONTEND_PRODUCTION_URL,
+      process.env.FRONTEND_DEVELOPMENT_URL,
+    ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
-    exposedHeaders: ["cookie", "set-cookie", , "access_token"],
+    exposedHeaders: ["access_token"],
   })
 );
 

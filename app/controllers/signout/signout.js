@@ -44,8 +44,8 @@ const signout = async (req, res) => {
     /**
      * Instead of clearing cookie, manually setting the cookie to hold empty string "" and setting expiry time to past
      */
-    // res.clearCookie(BODY_CONSTANT.TIME_TRACKER_TOKEN);
-    res.cookie(BODY_CONSTANT["TIME_TRACKER_TOKEN"], "", {
+    // res.clearCookie(BODY_CONSTANT.ACCESS_TOKEN);
+    res.cookie(BODY_CONSTANT["ACCESS_TOKEN"], "", {
       httpOnly: true,
       secure: true,
       sameSite: "None",
