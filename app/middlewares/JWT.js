@@ -29,7 +29,7 @@ const generateJWT = async (user) => {
    * @type {string}
    * @const
    */
-  const token = jwt.sign(data, JWTSecretKey);
+  const token = jwt.sign(data, JWTSecretKey, { expiresIn: "48h" });
   return token;
 };
 
