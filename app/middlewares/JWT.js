@@ -60,7 +60,7 @@ const validateJWT = async (req, res, next) => {
     /**
      * Checking if access_token is not present in the request header
      */
-    if (!req.header.hasOwnProperty(BODY_CONSTANT.ACCESS_TOKEN)) {
+    if (!req.headers.hasOwnProperty(BODY_CONSTANT.ACCESS_TOKEN)) {
       response = {
         statusCode: 401,
         message: COMMON_CONSTANT.INVALID_JWT,
@@ -74,7 +74,7 @@ const validateJWT = async (req, res, next) => {
      * @type {string}
      * @const
      */
-    const token = req.header[BODY_CONSTANT["ACCESS_TOKEN"]];
+    const token = req.headers[BODY_CONSTANT["ACCESS_TOKEN"]];
 
     /**
      * This is the status of the verification of the token

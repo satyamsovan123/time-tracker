@@ -26,7 +26,7 @@ const {
  * @param {{}} res is the response body that will be sent to client
  * @returns {{message: string, status: boolean}} success response with data or error response object based on various criterias
  */
-const profile = async (req, res) => {
+const getProfile = async (req, res) => {
   /**
    * This is the status of the current operation
    *
@@ -260,4 +260,4 @@ const deleteProfile = async (req, res) => {
   }
 };
 
-module.exports = { profile, deleteProfile };
+module.exports = { getProfile, deleteProfile };
