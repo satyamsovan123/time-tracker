@@ -1,5 +1,7 @@
 const jwt = require("jsonwebtoken");
 
+const moment = require("moment");
+
 const JWTSecretKey = process.env.JWT_SECRET_KEY;
 const { BODY_CONSTANT, COMMON_CONSTANT } = require("../../constants/constant");
 
@@ -24,12 +26,38 @@ const generateJWT = async (user) => {
   };
 
   /**
-   * This is the token that is returned
+   * This is the time for current midnight
+   *
+   * @type {object}
+   * @const
+   */
+  const midnight = moment(moment().format("YYYY-MM-DD") + " 23:59:59");
+
+  /**
+   * This is the current time
+   *
+   * @type {object}
+   * @const
+   */
+  const currentTime = moment(new Date());
+
+  /**
+   * Getting the difference between current time and midnight in hours, and appending "h"
    *
    * @type {string}
    * @const
    */
-  const token = jwt.sign(data, JWTSecretKey, { expiresIn: "48h" });
+  const durationInHours =
+    moment.duration(midnight.diff(currentTime)).asHours() + "h";
+
+  /**
+   * This is the token that is returned, the token should expire after '48h', but for current infrastructure limitation, it's configured to expire every midnight
+   *
+   * @type {string}
+   * @const
+   */
+
+  const token = jwt.sign(data, JWTSecretKey, { expiresIn: durationInHours });
   return token;
 };
 
