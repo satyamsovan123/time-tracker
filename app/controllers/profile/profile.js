@@ -241,7 +241,7 @@ const deleteProfile = async (req, res) => {
       status = true;
       response = {
         statusCode: 200,
-        message: DB_OPERATION_CONSTANT.DATA_DELETED,
+        message: DB_OPERATION_CONSTANT.PROFILE_DATA_DELETED,
         status: status,
       };
       return handleSuccess(response, res);
