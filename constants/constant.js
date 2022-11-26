@@ -34,7 +34,7 @@ const COMMON_CONSTANT = {
 };
 
 const DB_OPERATION_CONSTANT = {
-  DATA_ADDED: "Data added succesfully",
+  USER_DATA_ADDED: "You are now ready to take control of your time!",
   DATA_RETRIEVED: "Data retrieved succesfully",
   SINGLE_TIME_DATA_UPDATED: "Timing is added.",
   MULTIPLE_TIME_DATA_UPDATED: "The time sheet is updated.",
