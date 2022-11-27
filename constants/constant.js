@@ -19,7 +19,7 @@ const COMMON_CONSTANT = {
     "Sorry, we are unable to process your data. Please try again after some time.",
   AUTHENTICATION_SUCCESSFUL: "Sign in was successful.",
   AUTHENTICATION_UNSUCCESSFUL:
-    "Sorry, we are unable to sign you in. Please try again after some time.",
+    "The email and password did not match our records. Please try again with correct credentials.",
   DEV_ENV: "development",
   PROD_ENV: "production",
   DEFAULT_COMMENT:
@@ -42,7 +42,8 @@ const DB_OPERATION_CONSTANT = {
   PROFILE_DATA_DELETED:
     "Your account is deleted. And, we are sad to see you go.",
   USER_ALREADY_EXISTS: "An user already exists, probably your evil twin?",
-  USER_DOESNT_EXIST: "The email and password did not match our records.",
+  USER_DOESNT_EXIST:
+    "The email and password did not match our records. Please try again with correct credentials.",
   NO_DATA_FOUND: "No data found",
   UNABLE_TO_DELETE_DATA: "Unable to delete data",
   UNABLE_TO_RETRIEVE_DATA: "Unable to retrieve data",
