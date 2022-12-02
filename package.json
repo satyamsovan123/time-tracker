@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "bcrypt": "^5.1.0",
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
@@ -17,6 +18,9 @@
   "description": "This is backend for Time Tracker application.",
   "main": "app.js",
   "scripts": {
+    "start": "node app.js",
+    "development": "NODE_ENV=development node app.js",
+    "production": "NODE_ENV=production node app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "doc": "jsdoc -c jsdoc.json"
   },

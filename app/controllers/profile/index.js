@@ -1,3 +1,3 @@
-const { profile, deleteProfile } = require("./profile");
+const { getProfile, deleteProfile } = require("./profile");
 
-module.exports = { profile, deleteProfile };
+module.exports = { getProfile, deleteProfile };

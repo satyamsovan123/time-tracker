@@ -1,5 +1,5 @@
 const express = require("express");
-const { COMMON_CONSTANT } = require("../../constants/constant");
+const { COMMON_CONSTANT, BODY_CONSTANT } = require("../../constants/constant");
 const { handleSuccess, handleError } = require("../utils");
 const router = express.Router();
 const baseURL = "/api/";
@@ -7,6 +7,7 @@ const baseURL = "/api/";
 router.use(baseURL, require("./profile"));
 router.use(baseURL, require("./signup"));
 router.use(baseURL, require("./signin"));
+router.use(baseURL, require("./signout"));
 router.use(baseURL, require("./task"));
 router.use(baseURL, require("./insight"));
 
@@ -14,6 +15,8 @@ router.use(baseURL, require("./insight"));
  * This middleware function is handling the base route for it's used for quick testing and welcome
  */
 router.get("/", (req, res) => {
+  console.log(req.cookies[BODY_CONSTANT.ACCESS_TOKEN]);
+
   /**
    * This is the response that is sent to client
    *

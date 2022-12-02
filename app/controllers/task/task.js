@@ -306,7 +306,6 @@ const updateTask = async (req, res) => {
             new Date(task[BODY_CONSTANT.END_TIME]) -
               new Date(task[BODY_CONSTANT.START_TIME])
           ) / 3600000;
-
         if (
           task[BODY_CONSTANT.TIME_USED] > 0 &&
           maximumDuration >= task[BODY_CONSTANT.TIME_USED]
@@ -462,7 +461,11 @@ const updateTask = async (req, res) => {
       status = true;
       response = {
         statusCode: 200,
-        message: DB_OPERATION_CONSTANT.DATA_UPDATED,
+        message: `${
+          newTaskList.length === 1
+            ? DB_OPERATION_CONSTANT.SINGLE_TIME_DATA_UPDATED
+            : DB_OPERATION_CONSTANT.MULTIPLE_TIME_DATA_UPDATED
+        }`,
         status: status,
       };
 

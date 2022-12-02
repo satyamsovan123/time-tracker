@@ -1,4 +1,5 @@
 const express = require("express");
+const cookieParser = require("cookie-parser");
 const app = express();
 const cors = require("cors");
 require("dotenv").config();
@@ -6,17 +7,43 @@ require("dotenv").config();
 const initializeDatabase = require("./configs/connectToDatabase.js");
 const routes = require("./app/routes");
 const { validateRequestJSON } = require("./app/utils/validateRequestJSON.js");
+const { COMMON_CONSTANT } = require("./constants/constant.js");
 
-// app.use(cors());
+/**
+ * This is the frontend URL that is decided based on the environment for the NodeJS application, and this is used to whitelist the URL for accessing this backend application
+ *
+ * @type {string}
+ * @const
+ */
+const originForCORS =
+  process.env.NODE_ENV === COMMON_CONSTANT.PROD_ENV
+    ? process.env.FRONTEND_PRODUCTION_URL
+    : process.env.FRONTEND_DEVELOPMENT_URL;
+
+app.use(cookieParser());
+
 app.use(
   cors({
-    credentials: true,
     origin: [
-      process.env.FRONTEND_DEVELOPMENT_URL,
       process.env.FRONTEND_PRODUCTION_URL,
+      process.env.FRONTEND_DEVELOPMENT_URL,
     ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+    exposedHeaders: ["access_token"],
   })
 );
+
+// app.use(function (req, res, next) {
+//   res.setHeader(
+//     "Access-Control-Allow-Origin",
+//     "https://time-tracker-ui.web.app"
+//   );
+//   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, DELETE");
+//   res.setHeader("Access-Control-Allow-Credentials", true);
+//   next();
+// });
+
 app.use(express.json());
 app.use(validateRequestJSON);
 app.use(routes);

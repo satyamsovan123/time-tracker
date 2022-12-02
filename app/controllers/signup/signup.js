@@ -191,8 +191,14 @@ const signup = async (req, res) => {
     const newUser = new User({
       email: email,
       password: encryptedPassword,
-      firstName: firstName,
-      lastName: lastName,
+      firstName: firstName
+        .toLowerCase()
+        .replace(" ", "")
+        .replace(/\b\w/g, (firstName) => firstName.toUpperCase()),
+      lastName: lastName
+        .toLowerCase()
+        .replace(" ", "")
+        .replace(/\b\w/g, (lastName) => lastName.toUpperCase()),
     });
 
     /**
@@ -219,7 +225,7 @@ const signup = async (req, res) => {
       status = true;
       response = {
         statusCode: 201,
-        message: DB_OPERATION_CONSTANT.DATA_ADDED,
+        message: DB_OPERATION_CONSTANT.USER_DATA_ADDED,
         status: status,
       };
       return handleSuccess(response, res, token);
