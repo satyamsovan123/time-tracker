@@ -15,8 +15,6 @@ router.use(baseURL, require("./insight"));
  * This middleware function is handling the base route for it's used for quick testing and welcome
  */
 router.get("/", (req, res) => {
-  console.log(req.cookies[BODY_CONSTANT.ACCESS_TOKEN]);
-
   /**
    * This is the response that is sent to client
    *
