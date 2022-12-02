@@ -24,25 +24,12 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: [
-      process.env.FRONTEND_PRODUCTION_URL,
-      process.env.FRONTEND_DEVELOPMENT_URL,
-    ],
+    origin: originForCORS,
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
     exposedHeaders: ["access_token"],
   })
 );
-
-// app.use(function (req, res, next) {
-//   res.setHeader(
-//     "Access-Control-Allow-Origin",
-//     "https://time-tracker-ui.web.app"
-//   );
-//   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, DELETE");
-//   res.setHeader("Access-Control-Allow-Credentials", true);
-//   next();
-// });
 
 app.use(express.json());
 app.use(validateRequestJSON);
